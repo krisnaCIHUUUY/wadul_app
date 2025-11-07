@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "688256678166",
+    "project_id": "wadul-app",
+    "storage_bucket": "wadul-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:688256678166:android:9c9daa17b8fdd44e7e7837",
+        "android_client_info": {
+          "package_name": "com.example.wadul_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9OSYbl-Su9cHnobEOr_iYE4WV99Za3W8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
