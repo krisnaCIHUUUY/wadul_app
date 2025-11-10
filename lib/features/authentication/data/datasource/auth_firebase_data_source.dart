@@ -1,4 +1,3 @@
-// import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -45,8 +44,8 @@ class AuthFirebaseDataSourceImpl implements AuthFirebaseDataSource {
           'nama': nama,
           'nik': nik,
           'email': email,
-          'uid': user.uid, 
-          'createdAt': FieldValue.serverTimestamp(), 
+          'uid': user.uid,
+          'createdAt': FieldValue.serverTimestamp(),
           'emailVerified': user.emailVerified,
         });
         return 'berhasil mendaftar. Silakan cek email Anda untuk verifikasi.';
@@ -68,13 +67,39 @@ class AuthFirebaseDataSourceImpl implements AuthFirebaseDataSource {
     required String password,
   }) async {
     try {
-      await _firebaseAuth.signInWithEmailAndPassword(
+      final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      return "login berhasil";
+
+      final user = userCredential.user;
+
+      if (user == null) {
+        throw FirebaseAuthException(
+          code: 'user-null',
+          message: 'Login gagal: pengguna tidak ditemukan.',
+        );
+      }
+
+      if (!user.emailVerified) {
+        await _firebaseAuth.signOut();
+        throw FirebaseAuthException(
+          code: 'email-not-verified',
+          message: 'Email Anda belum diverifikasi. Silakan cek email Anda.',
+        );
+      }
+
+      return "Login berhasil";
     } on FirebaseAuthException catch (e) {
-      return e.message.toString();
+      throw FirebaseAuthException(
+        code: e.code,
+        message: e.message ?? 'Gagal login. Silakan coba lagi.',
+      );
+    } catch (e) {
+      throw FirebaseAuthException(
+        code: 'unexpected-error',
+        message: 'Kesalahan tidak terduga: ${e.toString()}',
+      );
     }
   }
 
@@ -100,20 +125,15 @@ class AuthFirebaseDataSourceImpl implements AuthFirebaseDataSource {
   @override
   Future<String> sendEmailPasswordReset({required String email}) async {
     try {
-
       await _firebaseAuth.sendPasswordResetEmail(email: email);
       return "email untuk reset password telah di kirimkan, silahkan cek email anda.";
-
     } on FirebaseAuthException catch (e) {
-
       if (e.code == 'user-not-found') {
         return 'Email yang Anda masukkan tidak terdaftar.';
-
       } else if (e.code == 'invalid-email') {
         return 'Format email tidak valid.';
       }
       return 'Gagal mengirim email: ${e.message}';
-      
     } catch (e) {
       return 'Terjadi kesalahan: ${e.toString()}';
     }

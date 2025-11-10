@@ -32,6 +32,12 @@ class _LoginPageState extends State<LoginPage> {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is AuthSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('login berhasil'),
+              backgroundColor: Colors.green,
+            ),
+          );
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => HomePage()),
@@ -114,7 +120,6 @@ class _LoginPageState extends State<LoginPage> {
                               hintText: "Email",
                               icon: Icons.email,
                               iconColor: hitamtext,
-                              // Tambahkan validator
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Email tidak boleh kosong';
@@ -172,6 +177,9 @@ class _LoginPageState extends State<LoginPage> {
                               onPressed: state is AuthLoading
                                   ? null
                                   : () async {
+                                      FocusScope.of(
+                                        context,
+                                      ).requestFocus(FocusNode());
                                       if (key.currentState!.validate()) {
                                         await context.read<AuthCubit>().masuk(
                                           email: _emailController.text.trim(),

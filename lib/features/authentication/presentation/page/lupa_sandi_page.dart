@@ -9,12 +9,13 @@ class LupaSandiPage extends StatefulWidget {
   const LupaSandiPage({super.key});
 
   @override
-  State<LupaSandiPage> createState() => _KonfirmasiAkunPageState();
+  State<LupaSandiPage> createState() => _LupaSandiPageState();
 }
 
-class _KonfirmasiAkunPageState extends State<LupaSandiPage> {
+class _LupaSandiPageState extends State<LupaSandiPage> {
   final _emailController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _isDialogShowing = false; 
 
   @override
   void dispose() {
@@ -23,20 +24,36 @@ class _KonfirmasiAkunPageState extends State<LupaSandiPage> {
   }
 
   void _showLoading(BuildContext context) {
+    if (_isDialogShowing) return; 
+    _isDialogShowing = true;
+
     showDialog(
       context: context,
       barrierDismissible: false,
+      useRootNavigator: true,
       builder: (context) => const Center(child: CircularProgressIndicator()),
-    );
+    ).then((_) {
+      _isDialogShowing = false; 
+    });
   }
 
   void _hideLoading(BuildContext context) {
-    if (Navigator.of(context, rootNavigator: true).canPop()) {
-      Navigator.of(context, rootNavigator: true).pop();
+    if (!mounted) return;
+
+    if (_isDialogShowing &&
+        Navigator.of(context, rootNavigator: true).canPop()) {
+      try {
+        Navigator.of(context, rootNavigator: true).pop();
+      } catch (_) {
+        // biarin aja kalau gagal pop
+      } finally {
+        _isDialogShowing = false;
+      }
     }
   }
 
   void _showSnackbar(BuildContext context, String message, bool isError) {
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -69,7 +86,10 @@ class _KonfirmasiAkunPageState extends State<LupaSandiPage> {
               Column(
                 children: [
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 35, vertical: 20),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 35,
+                      vertical: 20,
+                    ),
                     width: double.infinity,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

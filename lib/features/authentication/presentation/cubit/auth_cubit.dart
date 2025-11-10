@@ -1,12 +1,10 @@
-// import 'package:flutter/widgets.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wadul_app/features/authentication/domain/usecases/user_daftar.dart';
 import 'package:wadul_app/features/authentication/domain/usecases/user_logout.dart';
 import 'package:wadul_app/features/authentication/domain/usecases/user_lupa_sandi.dart';
 import 'package:wadul_app/features/authentication/domain/usecases/user_masuk.dart';
 import 'package:wadul_app/features/authentication/presentation/cubit/auth_state.dart';
-
-// part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final UserDaftar userDaftar;
@@ -42,16 +40,26 @@ class AuthCubit extends Cubit<AuthState> {
     } catch (e) {}
   }
 
-  Future<void> masuk({required String email, required String password}) async {
+Future<void> masuk({required String email, required String password}) async {
+    emit(AuthLoading());
     try {
-      emit(AuthLoading());
       final result = await userMasuk.call(email: email, password: password);
+
       result.fold(
-        (failure) => emit(AuthFailure(failure.message)),
-        (uid) => emit(AuthSuccess(uid)),
+        (failure) {
+          emit(AuthFailure(failure.message));
+        },
+        (message) {
+          emit(AuthSuccess(message));
+        },
       );
-    } catch (e) {}
+    } on FirebaseAuthException catch (e) {
+      emit(AuthFailure(e.message ?? 'Terjadi kesalahan autentikasi.'));
+    } catch (e) {
+      emit(AuthFailure('Terjadi kesalahan: ${e.toString()}'));
+    }
   }
+
 
   void logout() async {
     emit(AuthLoading());
@@ -72,11 +80,10 @@ class AuthCubit extends Cubit<AuthState> {
     final result = await userLupaSandi.call(email);
     result.fold(
       (failure) {
-        return AuthFailure(failure.message);
+        emit(AuthFailure(failure.message));
       },
       (success) {
-        print(success);
-        emit(AuthInitial());
+        emit(AuthSuccess(success));
       },
     );
   }
