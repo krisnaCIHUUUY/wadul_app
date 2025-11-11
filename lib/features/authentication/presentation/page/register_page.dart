@@ -66,7 +66,7 @@ class _RegisterPageState extends State<RegisterPage> {
         bool isLoading = state is AuthLoading;
 
         return Scaffold(
-          backgroundColor: putihBackgorund,
+          backgroundColor: putihBackground,
           body: SafeArea(
             child: Column(
               children: [

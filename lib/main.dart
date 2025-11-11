@@ -11,7 +11,7 @@ import 'package:wadul_app/features/authentication/domain/usecases/user_lupa_sand
 import 'package:wadul_app/features/authentication/domain/usecases/user_masuk.dart';
 import 'package:wadul_app/features/authentication/presentation/cubit/auth_cubit.dart';
 import 'package:wadul_app/features/authentication/presentation/page/home_page.dart';
-import 'package:wadul_app/features/authentication/presentation/page/login_page.dart';
+import 'package:wadul_app/features/authentication/presentation/page/onboarding_page.dart';
 import 'package:wadul_app/firebase_options.dart';
 
 void main() async {
@@ -79,7 +79,7 @@ class MyApp extends StatelessWidget {
             if (snapshot.hasData) {
               return HomePage();
             } else {
-              return LoginPage();
+              return OnboardingPage();
             }
           },
         ),
