@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:wadul_app/core/colors/custom_colors.dart';
-import 'package:wadul_app/core/pages/home_page.dart';
+import 'package:wadul_app/home_page.dart';
 import 'package:wadul_app/features/authentication/presentation/page/login_page.dart';
 import 'package:wadul_app/features/authentication/presentation/page/register_page.dart';
 import 'package:wadul_app/features/authentication/presentation/utils/onboarding_button.dart';

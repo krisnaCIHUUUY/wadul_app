@@ -8,12 +8,12 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: ElevatedButton(
-          onPressed: () => Navigator.pop(context),
-          child: Icon(Icons.arrow_back_ios),
-        ),
-      ),
+      // appBar: AppBar(
+      //   leading: ElevatedButton(
+      //     onPressed: () => Navigator.pop(context),
+      //     child: Icon(Icons.arrow_back_ios),
+      //   ),
+      // ),
       body: Center(
         child: ElevatedButton(
           onPressed: () {
