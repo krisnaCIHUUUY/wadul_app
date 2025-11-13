@@ -10,7 +10,7 @@ import 'package:wadul_app/features/authentication/domain/usecases/user_logout.da
 import 'package:wadul_app/features/authentication/domain/usecases/user_lupa_sandi.dart';
 import 'package:wadul_app/features/authentication/domain/usecases/user_masuk.dart';
 import 'package:wadul_app/features/authentication/presentation/cubit/auth_cubit.dart';
-import 'package:wadul_app/features/authentication/presentation/page/home_page.dart';
+import 'package:wadul_app/core/pages/home_page.dart';
 import 'package:wadul_app/features/authentication/presentation/page/onboarding_page.dart';
 import 'package:wadul_app/firebase_options.dart';
 

@@ -4,7 +4,7 @@ import 'package:wadul_app/core/colors/custom_colors.dart';
 import 'package:wadul_app/core/custom_textfield.dart';
 import 'package:wadul_app/features/authentication/presentation/cubit/auth_cubit.dart';
 import 'package:wadul_app/features/authentication/presentation/cubit/auth_state.dart';
-import 'package:wadul_app/features/authentication/presentation/page/home_page.dart';
+import 'package:wadul_app/core/pages/home_page.dart';
 import 'package:wadul_app/features/authentication/presentation/page/lupa_sandi_page.dart';
 import 'package:wadul_app/features/authentication/presentation/page/register_page.dart';
 
