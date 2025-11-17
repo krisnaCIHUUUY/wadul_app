@@ -174,7 +174,6 @@ class _HomeContentState extends State<HomeContent> {
             },
           ),
         ),
-        // BOTTOM NAVIGATION BAR E
       ],
     );
   }

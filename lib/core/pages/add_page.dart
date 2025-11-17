@@ -5,6 +5,12 @@ class AddPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Center(child: Text("add page")));
+    return Scaffold(
+      body: Stack(
+        children: [
+          Container(width: double.infinity, height: 80, color: Colors.amber),
+        ],
+      ),
+    );
   }
 }

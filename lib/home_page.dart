@@ -22,7 +22,7 @@ class _HomePageState extends State<HomePage> {
     Icons.person,
   ];
 
-  List<String> navTitles = ["Home", "notification", "", "article", "profile"];
+  List<String> navTitles = ["Home", "notification", "", "riwayat", "profile"];
 
   int selectedIndex = 0;
 
@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
         child: Stack(
           children: [
             AnimatedSwitcher(
-              duration: Duration(milliseconds: 200),
+              duration: Duration(milliseconds: 300),
               transitionBuilder: (child, Animation<double> animation) {
                 final offsetAnimation = Tween<Offset>(
                   begin: const Offset(0.1, 0.0),
@@ -58,6 +58,7 @@ class _HomePageState extends State<HomePage> {
               },
               child: pages[selectedIndex],
             ),
+
 
             Align(
               alignment: AlignmentGeometry.bottomCenter,

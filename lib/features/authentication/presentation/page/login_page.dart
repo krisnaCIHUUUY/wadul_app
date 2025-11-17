@@ -52,7 +52,15 @@ class _LoginPageState extends State<LoginPage> {
         return Scaffold(
           body: SafeArea(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Icon(Icons.arrow_back_ios),
+                  ),
+                ),
                 Container(
                   height: 200,
                   width: double.infinity,

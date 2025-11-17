@@ -53,7 +53,6 @@ class OnboardingPage extends StatelessWidget {
                 title: 'Daftar Akun',
                 onPressed: () {
                   log('Navigasi ke halaman pendaftaran');
-                  // Navigator.pushNamed(context, '/register');
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => RegisterPage()),
@@ -65,7 +64,6 @@ class OnboardingPage extends StatelessWidget {
                 title: 'Masuk',
                 onPressed: () {
                   log('Navigasi ke halaman login');
-                  // Navigator.pushNamed(context, '/login');
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => LoginPage()),
