@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wadul_app/core/colors/custom_colors.dart';
-import 'package:wadul_app/core/pages/add_page.dart';
+import 'package:wadul_app/features/report/presentation/pages/add_page.dart';
 import 'package:wadul_app/core/pages/article_page.dart';
 import 'package:wadul_app/core/pages/home_content.dart';
 import 'package:wadul_app/core/pages/notification_page.dart';
@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
         child: Stack(
           children: [
             AnimatedSwitcher(
-              duration: Duration(milliseconds: 300),
+              duration: Duration(milliseconds: 400),
               transitionBuilder: (child, Animation<double> animation) {
                 final offsetAnimation = Tween<Offset>(
                   begin: const Offset(0.1, 0.0),
@@ -58,7 +58,6 @@ class _HomePageState extends State<HomePage> {
               },
               child: pages[selectedIndex],
             ),
-
 
             Align(
               alignment: AlignmentGeometry.bottomCenter,

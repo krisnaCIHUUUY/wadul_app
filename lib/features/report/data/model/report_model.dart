@@ -11,7 +11,6 @@ class DocumentationModel extends Documentation {
 
   // Konversi dari Map Firestore ke DocumentationModel
   factory DocumentationModel.fromMap(Map<String, dynamic> map) {
-    // Menangani konversi Timestamp dari Firestore
     final timestamp = map['createdAt'] as Timestamp?;
     return DocumentationModel(
       fotoUrl: map['fotoUrl'] as String,
@@ -20,20 +19,16 @@ class DocumentationModel extends Documentation {
     );
   }
 
-  // Konversi ke Map untuk Firestore (saat disimpan)
-  // Catatan: Saat CREATE, 'createdAt' di set ke FieldValue.serverTimestamp() di level DataSource
+
   Map<String, dynamic> toMap() {
     return {
       'fotoUrl': fotoUrl,
       'deskripsi': deskripsi,
-      // Saat memanggil toMap() di sini, kita gunakan tipe DateTime standar,
-      // yang akan diubah oleh ReportModel.toMap() atau DataSource.
       'createdAt': createdAt,
     };
   }
 }
 
-// Model utama untuk Laporan (sebagai turunan dari ReportEntity)
 class ReportModel extends ReportEntity {
   const ReportModel({
     required super.id,
@@ -45,7 +40,7 @@ class ReportModel extends ReportEntity {
     required super.tanggal,
     required super.userID,
     required super.status,
-    super.documentation, // Tambahkan documentation
+    super.documentation, 
   });
 
   // ------------------------------------------------------------------
@@ -53,10 +48,8 @@ class ReportModel extends ReportEntity {
   // ------------------------------------------------------------------
   // Metode ini menerima Map<String, dynamic> dan ID dokumen
   factory ReportModel.fromMap(Map<String, dynamic> map, String id) {
-    // Menangani konversi Timestamp dari Firestore
     final timestamp = map['tanggal'] as Timestamp?;
 
-    // Mengkonversi daftar Map dokumentasi Firestore menjadi daftar DocumentationModel
     final documentationList = (map['documentation'] as List<dynamic>? ?? [])
         .map(
           (docMap) =>
@@ -65,13 +58,12 @@ class ReportModel extends ReportEntity {
         .toList();
 
     return ReportModel(
-      id: id, // Masukkan ID dokumen yang didapat dari Firestore snapshot
+      id: id, 
       judul: map["judul"] as String,
       deskripsi: map["deskripsi"] as String,
       kategori: map["kategori"] as String,
       lokasi: map["lokasi"] as String,
       buktiFotoURL: map["buktiFotoURL"] as String,
-      // Konversi Timestamp ke DateTime
       tanggal: timestamp?.toDate() ?? DateTime.now(),
       userID: map["userID"] as String,
       status: map["status"] as String,
@@ -84,28 +76,20 @@ class ReportModel extends ReportEntity {
   // ------------------------------------------------------------------
   Map<String, dynamic> toMap() {
     return {
-      // ID tidak disertakan di sini karena ID dokumen sudah ada di Firestore
       "judul": judul,
       "deskripsi": deskripsi,
       "kategori": kategori,
       "lokasi": lokasi,
       "buktiFotoURL": buktiFotoURL,
-      // Saat create, kita harus menggunakan FieldValue.serverTimestamp()
-      // Namun, jika digunakan untuk update, kita bisa menggunakan tipe DateTime
-      // Kita serahkan penggunaan FieldValue ke layer DataSource untuk konsistensi.
       "tanggal": tanggal,
       "userID": userID,
       "status": status,
-      // Konversi daftar model ke daftar map
       "documentation": documentation
           .map((doc) => (doc as DocumentationModel).toMap())
           .toList(),
     };
   }
 
-  // ------------------------------------------------------------------
-  // 3. COPY WITH
-  // ------------------------------------------------------------------
   ReportModel copyWith({
     String? id,
     String? judul,

@@ -68,9 +68,17 @@ class ReportDataSourceImpl implements ReportDataSource {
   }
 
   @override
-  Future<void> deleteReport(String reportId) {
-    // TODO: implement deleteReport
-    throw UnimplementedError();
+  Future<void> deleteReport(String reportId) async {
+    try {
+      await _firebaseFirestore.collection("report").doc(reportId).delete();
+      log('laporan berhasil di hapus');
+    } on FirebaseException catch (e) {
+      log("firebase error : ${e.message}");
+      throw Exception("gagal menghapus laporan ${e.message}");
+    } catch (e) {
+      log("unknow error: $e");
+      throw Exception("terjadi kesalahan saat menghapus laporan: $e");
+    }
   }
 
   @override
@@ -165,8 +173,33 @@ class ReportDataSourceImpl implements ReportDataSource {
     required String reportId,
     required String status,
     String? catatan,
-  }) {
-    // TODO: implement updateReportStatus
-    throw UnimplementedError();
+  }) async {
+    try {
+      final updateData = <String, dynamic>{
+        'status': status,
+        'updatedAt': FieldValue.serverTimestamp(),
+      };
+
+      if (catatan != null && catatan.isNotEmpty) {
+        updateData['catatanAdmin'] = catatan;
+      }
+
+      await _firebaseFirestore
+          .collection("report")
+          .doc(reportId)
+          .update(updateData);
+
+      log(
+        'Status laporan ID: $reportId berhasil diperbarui menjadi "$status".',
+      );
+    } on FirebaseException catch (e) {
+      log('Firebase Error saat updateReportStatus: ${e.message}');
+      throw Exception('Gagal memperbarui status laporan: ${e.code}');
+    } catch (e) {
+      log('Error tak terduga saat updateReportStatus: $e');
+      throw Exception(
+        'Terjadi kesalahan tidak terduga saat memperbarui status laporan.',
+      );
+    }
   }
 }

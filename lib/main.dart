@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wadul_app/core/injection_container.dart' as di;
 import 'package:wadul_app/features/authentication/data/datasource/auth_firebase_data_source.dart';
 import 'package:wadul_app/features/authentication/data/repository/auth_repository_impl.dart';
 import 'package:wadul_app/features/authentication/domain/usecases/user_daftar.dart';
@@ -30,6 +31,8 @@ void main() async {
   final userMasuk = UserMasuk(repository);
   final userLogout = UserLogout(repository);
   final userLupaSandi = UserLupaSandi(repository);
+
+  await di.initDependencies();
 
   runApp(
     MyApp(
