@@ -1,18 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:wadul_app/features/authentication/data/models/user_model.dart';
+import 'package:wadul_app/features/authentication/domain/entities/user_entity.dart';
 
 abstract interface class AuthFirebaseDataSource {
-  Future<String> daftar({
+  Future<UserEntity> daftar({
     required String nama,
     required String nik,
     required String email,
     required String password,
   });
 
-  Future<String> masuk({required String email, required String password});
+  Future<UserEntity> masuk({required String email, required String password});
   Future<void> logout();
   Future<void> resetEmailPassword(String newPassword);
   Future<String> sendEmailPasswordReset({required String email});
+  Future<UserEntity?> getCurrentUser();
 }
 
 class AuthFirebaseDataSourceImpl implements AuthFirebaseDataSource {
@@ -26,7 +29,7 @@ class AuthFirebaseDataSourceImpl implements AuthFirebaseDataSource {
        _firebaseFirestore = firebaseFirestore;
 
   @override
-  Future<String> daftar({
+  Future<UserEntity> daftar({
     required String nama,
     required String nik,
     required String email,
@@ -37,32 +40,36 @@ class AuthFirebaseDataSourceImpl implements AuthFirebaseDataSource {
         email: email,
         password: password,
       );
-      final user = userCredential.user;
-      if (user != null) {
-        await user.sendEmailVerification();
-        await _firebaseFirestore.collection('users').doc(user.uid).set({
+      final firebaseUser = userCredential.user;
+      if (firebaseUser != null) {
+        await firebaseUser.sendEmailVerification();
+        final userModel = UserModel.fromFirebaseUser(firebaseUser);
+
+        await _firebaseFirestore.collection('users').doc(firebaseUser.uid).set({
           'nama': nama,
           'nik': nik,
           'email': email,
-          'uid': user.uid,
+          'uid': firebaseUser.uid,
           'createdAt': FieldValue.serverTimestamp(),
-          'emailVerified': user.emailVerified,
+          'emailVerified': firebaseUser.emailVerified,
         });
-        return 'berhasil mendaftar. Silakan cek email Anda untuk verifikasi.';
-      } else {
-        return "gagal mendaftar";
+        return userModel;
       }
+      throw FirebaseAuthException(
+        code: 'sign-up-failed',
+        message: 'Gagal memdaftar',
+      );
     } on FirebaseAuthException catch (e) {
-      return "Error Autentikasi: ${e.message}";
+      throw FirebaseAuthException(code: e.code, message: e.message);
     } on FirebaseException catch (e) {
-      return "Error Firestore: ${e.message}";
+      throw FirebaseAuthException(code: e.code, message: e.message);
     } catch (e) {
-      return "Terjadi kesalahan: ${e.toString()}";
+      throw Exception('terjadi kesalahan: ${e.toString()}');
     }
   }
 
   @override
-  Future<String> masuk({
+  Future<UserEntity> masuk({
     required String email,
     required String password,
   }) async {
@@ -72,16 +79,16 @@ class AuthFirebaseDataSourceImpl implements AuthFirebaseDataSource {
         password: password,
       );
 
-      final user = userCredential.user;
+      final firebaseUser = userCredential.user;
 
-      if (user == null) {
+      if (firebaseUser == null) {
         throw FirebaseAuthException(
           code: 'user-null',
           message: 'Login gagal: pengguna tidak ditemukan.',
         );
       }
 
-      if (!user.emailVerified) {
+      if (!firebaseUser.emailVerified) {
         await _firebaseAuth.signOut();
         throw FirebaseAuthException(
           code: 'email-not-verified',
@@ -89,7 +96,9 @@ class AuthFirebaseDataSourceImpl implements AuthFirebaseDataSource {
         );
       }
 
-      return "Login berhasil";
+      final userModel = UserModel.fromFirebaseUser(firebaseUser);
+
+      return userModel;
     } on FirebaseAuthException catch (e) {
       throw FirebaseAuthException(
         code: e.code,
@@ -137,5 +146,14 @@ class AuthFirebaseDataSourceImpl implements AuthFirebaseDataSource {
     } catch (e) {
       return 'Terjadi kesalahan: ${e.toString()}';
     }
+  }
+
+  @override
+  Future<UserEntity?> getCurrentUser() async {
+    final firebaseUser = _firebaseAuth.currentUser;
+    if (firebaseUser != null) {
+      return UserModel.fromFirebaseUser(firebaseUser);
+    }
+    return null;
   }
 }

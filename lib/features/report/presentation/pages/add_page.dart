@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wadul_app/features/report/presentation/instansi_card.dart';
+import 'package:wadul_app/features/report/presentation/widgets/instansi_card.dart';
 
 class AddPage extends StatelessWidget {
   const AddPage({super.key});

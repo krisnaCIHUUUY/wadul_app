@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -34,27 +35,34 @@ class _ReportFormPageState extends State<ReportFormPage> {
     super.dispose();
   }
 
-  void _submitReport(BuildContext context) {
-    // 1. Validasi Input
+ void _submitReport(BuildContext context) {
     if (!_formKey.currentState!.validate()) {
-      return; // Stop jika ada error validasi di field
+      return;
     }
-
-    // 2. Buat ReportEntity dari data input
+    final auth = FirebaseAuth.instance;
+    final currentUserId = auth.currentUser?.uid;
+    if (currentUserId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error: Anda harus login untuk membuat laporan.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    
     final newReport = ReportEntity(
-      id: null, // ID diisi oleh Firestore saat dibuat
+      id: null,
       judul: judulController.text,
       deskripsi: deskripsiController.text,
       kategori: kategoriController.text,
       lokasi: lokasiController.text,
       buktiFotoURL: tambahFotoController.text.isNotEmpty
           ? tambahFotoController.text
-          : 'http://default_no_photo.jpg', // Placeholder jika kosong
-      tanggal:
-          DateTime.now(), // Waktu lokal, akan ditimpa oleh serverTimestamp di Data Source
-      userID:
-          'USER_ID_CURRENTLY_LOGGED_IN', // **TODO:** Ambil dari Auth Service
-      status: 'Pending', // Status awal
+          : 'http://default_no_photo.jpg',
+      tanggal: DateTime.now(),
+      userID: currentUserId,
+      status: 'Pending',
     );
 
     context.read<ReportCubit>().createReport(newReport);
@@ -74,7 +82,6 @@ class _ReportFormPageState extends State<ReportFormPage> {
                   backgroundColor: Colors.green,
                 ),
               );
-              // Tambahkan sedikit delay sebelum pop agar Snackbar sempat terlihat
               Future.delayed(const Duration(milliseconds: 1500), () {
                 Navigator.pop(context);
               });

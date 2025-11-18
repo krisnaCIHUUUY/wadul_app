@@ -10,15 +10,11 @@ import 'package:wadul_app/features/report/domain/usecases/update_report_status.d
 import 'package:wadul_app/features/report/presentation/cubit/report_state.dart';
 
 class ReportCubit extends Cubit<ReportState> {
-  // Use Case yang diinject
   final CreateReport createNewReport;
   final GetReportsByUser getReportsByUser;
-  final UpdateReportStatus updateReportStatus; // <-- Use Case baru
+  final UpdateReportStatus updateReportStatus; 
   final DeleteReport deleteReport;
   final GetReportById getReportById;
-
-  // Daftarkan Use Case lain di sini jika dibutuhkan
-  // final GetReportsByUser getReportsByUser;
 
   ReportCubit({
     required this.getReportById,
@@ -28,37 +24,26 @@ class ReportCubit extends Cubit<ReportState> {
     required this.getReportsByUser,
   }) : super(ReportInitial());
 
-  /// Metode untuk memicu pembuatan laporan baru.
   Future<void> createReport(ReportEntity report) async {
-    // 1. Emit Loading State
     emit(ReportLoading());
 
     try {
-      // 2. Panggil Use Case
       await createNewReport(report);
-
-      // 3. Emit Success State
       emit(const ReportSuccess("Laporan berhasil dibuat!"));
     } catch (e) {
-      // 4. Tangani Error dan Emit Failure State
-      // Kita ambil pesan error dari exception yang dilempar oleh Use Case/Repository
+
       emit(ReportFailure(e.toString().replaceAll('Exception: ', '')));
     }
   }
 
-  // TODO: Tambahkan metode lain seperti updateReportStatus, deleteReport, dll.
   Future<void> fetchReportsByUser(String userId) async {
-    // Emit Loading (agar UI menampilkan indikator)
     emit(ReportLoading());
 
     try {
-      // Panggil Use Case
       final reports = await getReportsByUser(userId);
 
-      // Emit Loaded State dengan data yang diambil
       emit(ReportLoaded(reports));
     } catch (e) {
-      // Tangani Error
       emit(ReportFailure(e.toString().replaceAll('Exception: ', '')));
     }
   }
@@ -105,13 +90,10 @@ class ReportCubit extends Cubit<ReportState> {
     emit(ReportLoading());
 
     try {
-      // Panggil Use Case
       final report = await getReportById(reportId);
 
-      // Emit State Detail Loaded
       emit(ReportDetailLoaded(report));
     } catch (e) {
-      // Tangani Error
       emit(ReportFailure(e.toString().replaceAll('Exception: ', '')));
     }
   }

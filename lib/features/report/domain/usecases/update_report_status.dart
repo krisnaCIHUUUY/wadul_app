@@ -5,13 +5,11 @@ class UpdateReportStatus {
 
   UpdateReportStatus(this.repository);
 
-  /// Memperbarui status laporan tertentu.
   Future<void> call({
     required String reportId,
     required String status,
     String? catatan,
   }) async {
-    // 1. Logika Bisnis (Validasi)
     if (reportId.isEmpty) {
       throw Exception('ID laporan harus disediakan untuk pembaruan.');
     }
@@ -19,7 +17,6 @@ class UpdateReportStatus {
       throw Exception('Status laporan tidak boleh kosong.');
     }
 
-    // 2. Memanggil Repository
     await repository.updateReportStatus(
       reportId: reportId,
       status: status,

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wadul_app/features/authentication/domain/usecases/get_current_user.dart';
 import 'package:wadul_app/features/authentication/domain/usecases/user_daftar.dart';
 import 'package:wadul_app/features/authentication/domain/usecases/user_logout.dart';
 import 'package:wadul_app/features/authentication/domain/usecases/user_lupa_sandi.dart';
@@ -11,11 +12,13 @@ class AuthCubit extends Cubit<AuthState> {
   final UserMasuk userMasuk;
   final UserLogout userLogout;
   final UserLupaSandi userLupaSandi;
+  final GetCurrentUser getCurrentUser;
   AuthCubit(
     this.userDaftar,
     this.userMasuk,
     this.userLogout,
     this.userLupaSandi,
+    this.getCurrentUser,
   ) : super(AuthInitial());
 
   Future<void> daftar({
@@ -26,31 +29,31 @@ class AuthCubit extends Cubit<AuthState> {
   }) async {
     try {
       emit(AuthLoading());
-      final result = await userDaftar.call(
+      final userEntity = await userDaftar.call(
         nama: nama,
         nik: nik,
         email: email,
         password: password,
       );
 
-      result.fold(
+      userEntity.fold(
         (failure) => emit(AuthFailure(failure.message)),
-        (uid) => emit(AuthSuccess(uid)),
+        (uid) => emit(AuthSuccess(uid.toString())),
       );
     } catch (e) {}
   }
 
-Future<void> masuk({required String email, required String password}) async {
+  Future<void> masuk({required String email, required String password}) async {
     emit(AuthLoading());
     try {
-      final result = await userMasuk.call(email: email, password: password);
+      final userEntity = await userMasuk.call(email: email, password: password);
 
-      result.fold(
+      userEntity.fold(
         (failure) {
           emit(AuthFailure(failure.message));
         },
         (message) {
-          emit(AuthSuccess(message));
+          emit(AuthSuccess(message.toString()));
         },
       );
     } on FirebaseAuthException catch (e) {
@@ -59,7 +62,6 @@ Future<void> masuk({required String email, required String password}) async {
       emit(AuthFailure('Terjadi kesalahan: ${e.toString()}'));
     }
   }
-
 
   void logout() async {
     emit(AuthLoading());
@@ -84,6 +86,21 @@ Future<void> masuk({required String email, required String password}) async {
       },
       (success) {
         emit(AuthSuccess(success));
+      },
+    );
+  }
+
+  Future<void> currentUser() async {
+    emit(AuthLoading());
+    final currentUser = await getCurrentUser.call();
+    currentUser.fold(
+      (failure) {
+        emit(AuthFailure(failure.message));
+      },
+      (userEntity) {
+        if (userEntity != null) {
+          emit(AuthLoaded(userEntity));
+        }
       },
     );
   }

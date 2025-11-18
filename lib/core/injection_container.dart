@@ -5,16 +5,11 @@ import 'package:wadul_app/features/report/data/datasource/report_data_source.dar
 import 'package:wadul_app/features/report/domain/repository/report_repository.dart';
 import 'package:wadul_app/features/report/domain/usecases/create_report.dart';
 
-// --- Import Use Cases yang Hilang ---
-// Anda harus memastikan file-file Use Case ini di-import:
 import 'package:wadul_app/features/report/domain/usecases/get_report_by_user.dart';
 import 'package:wadul_app/features/report/domain/usecases/delete_report.dart';
 import 'package:wadul_app/features/report/domain/usecases/update_report_status.dart';
 import 'package:wadul_app/features/report/domain/usecases/get_report_by_id.dart';
-// --- End Import ---
-
 import 'package:wadul_app/features/report/data/repository/repository_impl.dart';
-// import 'package:wadul_app/features/report/data/datasource/report_data_source.dart'; // Asumsi ReportDataSourceImpl ada di sini
 import 'package:wadul_app/features/report/presentation/cubit/report_cubit.dart';
 
 final sl = GetIt.instance;
@@ -38,10 +33,11 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => CreateReport(sl()));
 
   // REGISTRASI USE CASE YANG DIBUTUHKAN CUBIT TAPI TIDAK ADA DI KODE ANDA SEBELUMNYA:
-  sl.registerLazySingleton(() => GetReportsByUser(sl())); // <-- Ditambahkan
-  sl.registerLazySingleton(() => DeleteReport(sl())); // <-- Ditambahkan
-  sl.registerLazySingleton(() => UpdateReportStatus(sl())); // <-- Ditambahkan
-  sl.registerLazySingleton(() => GetReportById(sl())); // <-- Ditambahkan
+  sl.registerLazySingleton(() => GetReportsByUser(sl())); 
+  sl.registerLazySingleton(() => DeleteReport(sl())); 
+  sl.registerLazySingleton(() => UpdateReportStatus(sl())); 
+  sl.registerLazySingleton(() => GetReportById(sl())); 
+  // sl.registerLazySingleton(() => GetCurrentUser(sl())); 
 
   // --------------------------------------------------------------------------------
   // 5. Presentation Layer (BLoC/Cubit) - Sekarang semua dependensi sudah ada
@@ -53,6 +49,7 @@ Future<void> initDependencies() async {
       deleteReport: sl(),
       updateReportStatus: sl(),
       getReportById: sl(),
+      
     ),
   );
 }

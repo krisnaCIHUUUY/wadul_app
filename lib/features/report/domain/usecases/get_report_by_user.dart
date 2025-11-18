@@ -8,15 +8,12 @@ class GetReportsByUser {
 
   GetReportsByUser(this.repository);
 
-  /// Mengambil daftar laporan berdasarkan ID pengguna tertentu.
-  /// Menerima [userId] sebagai parameter.
+
   Future<List<ReportEntity>> call(String userId) async {
-    // 1. Logika Bisnis (misalnya, memvalidasi format userId)
     if (userId.isEmpty) {
       throw Exception('User ID tidak boleh kosong.');
     }
 
-    // 2. Memanggil Repository untuk mendapatkan data
     return await repository.getReportsByUser(userId);
   }
 }
