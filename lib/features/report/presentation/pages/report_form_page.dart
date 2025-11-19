@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:wadul_app/core/colors/custom_colors.dart';
 import 'package:wadul_app/core/custom_textfield.dart';
 import 'package:wadul_app/features/report/domain/entities/report_entity.dart';
@@ -9,6 +13,8 @@ import 'package:wadul_app/features/report/presentation/cubit/report_cubit.dart';
 import 'package:wadul_app/features/report/presentation/cubit/report_state.dart';
 
 final sl = GetIt.instance;
+final supabase = Supabase.instance.client;
+const _bucketName = "report_image";
 
 class ReportFormPage extends StatefulWidget {
   const ReportFormPage({super.key});
@@ -23,7 +29,8 @@ class _ReportFormPageState extends State<ReportFormPage> {
   final deskripsiController = TextEditingController();
   final kategoriController = TextEditingController();
   final lokasiController = TextEditingController();
-  final tambahFotoController = TextEditingController();
+  File? _pickedImage;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void dispose() {
@@ -31,16 +38,55 @@ class _ReportFormPageState extends State<ReportFormPage> {
     deskripsiController.dispose();
     kategoriController.dispose();
     lokasiController.dispose();
-    tambahFotoController.dispose();
     super.dispose();
   }
 
- void _submitReport(BuildContext context) {
+  Future<String> _uploadImageToSupabase(File file, String userId) async {
+    try {
+      final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+      final String fileExtension = file.path.split('.').last;
+      final String fileName = 'report_${userId}_$timestamp.$fileExtension';
+
+      await supabase.storage
+          .from(_bucketName)
+          .upload(
+            fileName,
+            file,
+            fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+          );
+
+      // Dapatkan URL publik
+      final String publicUrl = supabase.storage
+          .from(_bucketName)
+          .getPublicUrl(fileName);
+      return publicUrl;
+    } on StorageException catch (e) {
+      throw Exception('Supabase Storage Error: ${e.message}');
+    } catch (e) {
+      throw Exception('Kesalahan tidak terduga saat upload: ${e.toString()}');
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _pickedImage = File(pickedFile.path);
+      });
+    }
+  }
+
+  void _submitReport(BuildContext context) async {
+
     if (!_formKey.currentState!.validate()) {
       return;
     }
+
+    context.read<ReportCubit>().emit(ReportLoading());
+
     final auth = FirebaseAuth.instance;
     final currentUserId = auth.currentUser?.uid;
+
     if (currentUserId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -50,22 +96,35 @@ class _ReportFormPageState extends State<ReportFormPage> {
       );
       return;
     }
-    
-    final newReport = ReportEntity(
-      id: null,
-      judul: judulController.text,
-      deskripsi: deskripsiController.text,
-      kategori: kategoriController.text,
-      lokasi: lokasiController.text,
-      buktiFotoURL: tambahFotoController.text.isNotEmpty
-          ? tambahFotoController.text
-          : 'http://default_no_photo.jpg',
-      tanggal: DateTime.now(),
-      userID: currentUserId,
-      status: 'Pending',
-    );
 
-    context.read<ReportCubit>().createReport(newReport);
+    String finalPhotoUrl = 'http://default_no_photo.jpg';
+
+    try {
+      if (_pickedImage != null) {
+        finalPhotoUrl = await _uploadImageToSupabase(
+          _pickedImage!,
+          currentUserId,
+        );
+      }
+
+      final newReport = ReportEntity(
+        id: null,
+        judul: judulController.text,
+        deskripsi: deskripsiController.text,
+        kategori: kategoriController.text,
+        lokasi: lokasiController.text,
+        buktiFotoURL: finalPhotoUrl,
+        tanggal: DateTime.now(),
+        userID: currentUserId,
+        status: 'Pending',
+      );
+
+      await context.read<ReportCubit>().createReport(newReport);
+    } catch (e) {
+      context.read<ReportCubit>().emit(
+        ReportFailure(e.toString().replaceAll("Exception: ", "")),
+      );
+    }
   }
 
   @override
@@ -154,7 +213,7 @@ class _ReportFormPageState extends State<ReportFormPage> {
               validator: (value) =>
                   value == null || value.isEmpty ? 'Judul wajib diisi' : null,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             CustomTextfield(
               controller: deskripsiController,
               hintText: "deskripsi",
@@ -163,28 +222,58 @@ class _ReportFormPageState extends State<ReportFormPage> {
                   ? 'Deskripsi wajib diisi'
                   : null,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
 
             CustomTextfield(
               controller: kategoriController,
               hintText: "kategori",
               obscureText: false,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
 
             CustomTextfield(
               controller: lokasiController,
               hintText: "lokasi",
               obscureText: false,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
+            
+            Container(
+              padding: EdgeInsets.only(left: 50, right: 10),
+              height: 50,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                color: putihText,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      _pickedImage != null
+                          ? 'File: ${_pickedImage!.path.split('/').last}'
+                          : "Tambahkan Foto Bukti",
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 15,
+                        color: _pickedImage != null
+                            ? Colors.black87
+                            : Colors.grey,
+                      ),
+                    ),
+                  ),
 
-            CustomTextfield(
-              controller: tambahFotoController,
-              hintText: "tambah foto",
-              obscureText: false,
+                  IconButton(
+                    onPressed: _pickImage,
+                    icon: Icon(Icons.file_download_outlined),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 25),
+
             BlocBuilder<ReportCubit, ReportState>(
               builder: (context, state) {
                 final bool isLoading = state is ReportLoading;

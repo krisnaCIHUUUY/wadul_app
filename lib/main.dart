@@ -3,9 +3,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide User; //
 import 'package:wadul_app/core/injection_container.dart' as di;
 import 'package:wadul_app/features/authentication/data/datasource/auth_firebase_data_source.dart';
 import 'package:wadul_app/features/authentication/data/repository/auth_repository_impl.dart';
+import 'package:wadul_app/features/authentication/domain/usecases/get_current_user.dart';
 import 'package:wadul_app/features/authentication/domain/usecases/user_daftar.dart';
 import 'package:wadul_app/features/authentication/domain/usecases/user_logout.dart';
 import 'package:wadul_app/features/authentication/domain/usecases/user_lupa_sandi.dart';
@@ -15,8 +17,14 @@ import 'package:wadul_app/home_page.dart';
 import 'package:wadul_app/features/authentication/presentation/page/onboarding_page.dart';
 import 'package:wadul_app/firebase_options.dart';
 
+const supabaseUrl = "https://riiqdykoybbrflfrpyoe.supabase.co";
+const anonKey = String.fromEnvironment(
+  "sb_publishable_u5QNQuI3-Qnn375qWfE6tg_QaxGJaEE",
+);
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Supabase.initialize(url: supabaseUrl, anonKey: anonKey);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
@@ -31,6 +39,7 @@ void main() async {
   final userMasuk = UserMasuk(repository);
   final userLogout = UserLogout(repository);
   final userLupaSandi = UserLupaSandi(repository);
+  final currenUser = GetCurrentUser(repository);
 
   await di.initDependencies();
 
@@ -40,6 +49,7 @@ void main() async {
       userMasuk: userMasuk,
       userLogout: userLogout,
       userLupaSandi: userLupaSandi,
+      currentUser: currenUser,
     ),
   );
 }
@@ -49,6 +59,7 @@ class MyApp extends StatelessWidget {
   final UserMasuk userMasuk;
   final UserLogout userLogout;
   final UserLupaSandi userLupaSandi;
+  final GetCurrentUser currentUser;
 
   const MyApp({
     super.key,
@@ -56,6 +67,7 @@ class MyApp extends StatelessWidget {
     required this.userMasuk,
     required this.userLogout,
     required this.userLupaSandi,
+    required this.currentUser,
   });
 
   @override
@@ -63,8 +75,13 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) =>
-              AuthCubit(userDaftar, userMasuk, userLogout, userLupaSandi),
+          create: (_) => AuthCubit(
+            userDaftar,
+            userMasuk,
+            userLogout,
+            userLupaSandi,
+            currentUser,
+          ),
         ),
       ],
       child: MaterialApp(

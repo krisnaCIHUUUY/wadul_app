@@ -12,8 +12,6 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
-    // gawe halaman profile untuk user yang telah login
-    // context.read<AuthCubit>().getCurrentUser;
     super.initState();
   }
 

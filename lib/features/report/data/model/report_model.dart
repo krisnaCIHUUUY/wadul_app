@@ -43,10 +43,6 @@ class ReportModel extends ReportEntity {
     super.documentation, 
   });
 
-  // ------------------------------------------------------------------
-  // 1. FACTORY FROM MAP (Mengambil data dari Firestore)
-  // ------------------------------------------------------------------
-  // Metode ini menerima Map<String, dynamic> dan ID dokumen
   factory ReportModel.fromMap(Map<String, dynamic> map, String id) {
     final timestamp = map['tanggal'] as Timestamp?;
 
