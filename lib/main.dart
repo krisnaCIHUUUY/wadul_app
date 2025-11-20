@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' hide User; //
+import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 import 'package:wadul_app/core/injection_container.dart' as di;
 import 'package:wadul_app/features/authentication/data/datasource/auth_firebase_data_source.dart';
 import 'package:wadul_app/features/authentication/data/repository/auth_repository_impl.dart';
@@ -18,9 +18,8 @@ import 'package:wadul_app/features/authentication/presentation/page/onboarding_p
 import 'package:wadul_app/firebase_options.dart';
 
 const supabaseUrl = "https://riiqdykoybbrflfrpyoe.supabase.co";
-const anonKey = String.fromEnvironment(
-  "sb_publishable_u5QNQuI3-Qnn375qWfE6tg_QaxGJaEE",
-);
+const anonKey =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpaXFkeWtveWJicmZsZnJweW9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1NTIyOTMsImV4cCI6MjA3OTEyODI5M30.MDyuiJmT8fSr-MKcqgzzq7jjPVbpuVLwTx6p3jl-QCY";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

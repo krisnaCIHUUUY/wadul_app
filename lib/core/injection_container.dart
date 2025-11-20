@@ -25,7 +25,7 @@ Future<void> initDependencies() async {
   );
 
   // --- 3. Domain Layer (Repository) ---
-  sl.registerLazySingleton<ReportRepository>(() => RepositoryImpl(sl()));
+  sl.registerLazySingleton<ReportRepository>(() => ReportRepositoryImpl(sl()));
 
   // --------------------------------------------------------------------------------
   // 4. Domain Layer (Use Cases) - HARUS MEREGISTRASI SEMUA DEPENDENSI CUBIT
@@ -33,11 +33,11 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => CreateReport(sl()));
 
   // REGISTRASI USE CASE YANG DIBUTUHKAN CUBIT TAPI TIDAK ADA DI KODE ANDA SEBELUMNYA:
-  sl.registerLazySingleton(() => GetReportsByUser(sl())); 
-  sl.registerLazySingleton(() => DeleteReport(sl())); 
-  sl.registerLazySingleton(() => UpdateReportStatus(sl())); 
-  sl.registerLazySingleton(() => GetReportById(sl())); 
-  // sl.registerLazySingleton(() => GetCurrentUser(sl())); 
+  sl.registerLazySingleton(() => GetReportsByUser(sl()));
+  sl.registerLazySingleton(() => DeleteReport(sl()));
+  sl.registerLazySingleton(() => UpdateReportStatus(sl()));
+  sl.registerLazySingleton(() => GetReportById(sl()));
+  // sl.registerLazySingleton(() => GetCurrentUser(sl()));
 
   // --------------------------------------------------------------------------------
   // 5. Presentation Layer (BLoC/Cubit) - Sekarang semua dependensi sudah ada
@@ -49,7 +49,6 @@ Future<void> initDependencies() async {
       deleteReport: sl(),
       updateReportStatus: sl(),
       getReportById: sl(),
-      
     ),
   );
 }

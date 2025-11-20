@@ -5,9 +5,9 @@ import 'package:wadul_app/features/report/data/datasource/report_data_source.dar
 import 'package:wadul_app/features/report/domain/entities/report_entity.dart';
 import 'package:wadul_app/features/report/domain/repository/report_repository.dart';
 
-class RepositoryImpl implements ReportRepository {
+class ReportRepositoryImpl implements ReportRepository {
   final ReportDataSource dataSource;
-  RepositoryImpl(this.dataSource);
+  ReportRepositoryImpl(this.dataSource);
   @override
   Future<void> addDocumentation({
     required String reportId,

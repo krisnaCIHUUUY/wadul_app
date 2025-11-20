@@ -52,7 +52,11 @@ class _ReportFormPageState extends State<ReportFormPage> {
           .upload(
             fileName,
             file,
-            fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+            fileOptions: const FileOptions(
+              cacheControl: '3600',
+              upsert: false,
+              // headers: {"authorization": ''},
+            ),
           );
 
       // Dapatkan URL publik
@@ -61,6 +65,7 @@ class _ReportFormPageState extends State<ReportFormPage> {
           .getPublicUrl(fileName);
       return publicUrl;
     } on StorageException catch (e) {
+      print(e.message);
       throw Exception('Supabase Storage Error: ${e.message}');
     } catch (e) {
       throw Exception('Kesalahan tidak terduga saat upload: ${e.toString()}');
@@ -77,7 +82,6 @@ class _ReportFormPageState extends State<ReportFormPage> {
   }
 
   void _submitReport(BuildContext context) async {
-
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -115,7 +119,7 @@ class _ReportFormPageState extends State<ReportFormPage> {
         lokasi: lokasiController.text,
         buktiFotoURL: finalPhotoUrl,
         tanggal: DateTime.now(),
-        userID: currentUserId,
+        userId: currentUserId,
         status: 'Pending',
       );
 
@@ -237,7 +241,7 @@ class _ReportFormPageState extends State<ReportFormPage> {
               obscureText: false,
             ),
             const SizedBox(height: 10),
-            
+
             Container(
               padding: EdgeInsets.only(left: 50, right: 10),
               height: 50,

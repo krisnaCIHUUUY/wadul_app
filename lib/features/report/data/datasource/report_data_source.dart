@@ -42,7 +42,7 @@ class ReportDataSourceImpl implements ReportDataSource {
         "createAt": FieldValue.serverTimestamp(),
       };
 
-      await _firebaseFirestore.collection("report").doc(reportId).update({
+      await _firebaseFirestore.collection("reports").doc(reportId).update({
         'documentation': FieldValue.arrayUnion([newDocumentationMap]),
       });
     } on FirebaseException catch (e) {
@@ -57,9 +57,9 @@ class ReportDataSourceImpl implements ReportDataSource {
   @override
   Future<void> createReport(ReportEntity report) async {
     try {
-      final reportModel = report as ReportModel;
+      final reportModel = ReportModel.fromEntity(report);
       Map<String, dynamic> dataToSave = reportModel.toMap();
-      await _firebaseFirestore.collection("report").add(dataToSave);
+      await _firebaseFirestore.collection("reports").add(dataToSave);
       log("data behasil di upload");
     } on FirebaseException catch (e) {
       log("error takterduga:  ${e.message}");
@@ -70,7 +70,7 @@ class ReportDataSourceImpl implements ReportDataSource {
   @override
   Future<void> deleteReport(String reportId) async {
     try {
-      await _firebaseFirestore.collection("report").doc(reportId).delete();
+      await _firebaseFirestore.collection("reports").doc(reportId).delete();
       log('laporan berhasil di hapus');
     } on FirebaseException catch (e) {
       log("firebase error : ${e.message}");
@@ -85,7 +85,7 @@ class ReportDataSourceImpl implements ReportDataSource {
   Future<List<ReportEntity>> getAllReports() async {
     try {
       final QuerySnapshot snapshot = await _firebaseFirestore
-          .collection("report")
+          .collection("reports")
           .get();
 
       final List<ReportEntity> reports = snapshot.docs
@@ -112,7 +112,7 @@ class ReportDataSourceImpl implements ReportDataSource {
   Future<ReportEntity> getReportById(String reportId) async {
     try {
       final DocumentSnapshot docSnapshot = await _firebaseFirestore
-          .collection("report")
+          .collection("reports")
           .doc(reportId)
           .get();
 
@@ -142,7 +142,7 @@ class ReportDataSourceImpl implements ReportDataSource {
   Future<List<ReportEntity>> getReportByUser(String userId) async {
     try {
       final QuerySnapshot snapshot = await _firebaseFirestore
-          .collection("report")
+          .collection("reports")
           .where('userID', isEqualTo: userId)
           .get();
 
@@ -185,7 +185,7 @@ class ReportDataSourceImpl implements ReportDataSource {
       }
 
       await _firebaseFirestore
-          .collection("report")
+          .collection("reports")
           .doc(reportId)
           .update(updateData);
 

@@ -19,13 +19,8 @@ class DocumentationModel extends Documentation {
     );
   }
 
-
   Map<String, dynamic> toMap() {
-    return {
-      'fotoUrl': fotoUrl,
-      'deskripsi': deskripsi,
-      'createdAt': createdAt,
-    };
+    return {'fotoUrl': fotoUrl, 'deskripsi': deskripsi, 'createdAt': createdAt};
   }
 }
 
@@ -38,9 +33,9 @@ class ReportModel extends ReportEntity {
     required super.lokasi,
     required super.buktiFotoURL,
     required super.tanggal,
-    required super.userID,
+    required super.userId,
     required super.status,
-    super.documentation, 
+    super.documentation,
   });
 
   factory ReportModel.fromMap(Map<String, dynamic> map, String id) {
@@ -54,22 +49,38 @@ class ReportModel extends ReportEntity {
         .toList();
 
     return ReportModel(
-      id: id, 
+      id: id,
       judul: map["judul"] as String,
       deskripsi: map["deskripsi"] as String,
       kategori: map["kategori"] as String,
       lokasi: map["lokasi"] as String,
       buktiFotoURL: map["buktiFotoURL"] as String,
       tanggal: timestamp?.toDate() ?? DateTime.now(),
-      userID: map["userID"] as String,
+      userId: map["userId"] as String,
       status: map["status"] as String,
       documentation: documentationList,
+    );
+  }
+
+  factory ReportModel.fromEntity(ReportEntity entity) {
+    return ReportModel(
+      id: entity.id,
+      judul: entity.judul,
+      deskripsi: entity.deskripsi,
+      kategori: entity.kategori,
+      lokasi: entity.lokasi,
+      buktiFotoURL: entity.buktiFotoURL,
+      tanggal: entity.tanggal,
+      userId: entity.userId,
+      status: entity.status,
+      documentation: entity.documentation,
     );
   }
 
   // ------------------------------------------------------------------
   // 2. TO MAP (Mengirim data ke Firestore)
   // ------------------------------------------------------------------
+  @override
   Map<String, dynamic> toMap() {
     return {
       "judul": judul,
@@ -78,11 +89,20 @@ class ReportModel extends ReportEntity {
       "lokasi": lokasi,
       "buktiFotoURL": buktiFotoURL,
       "tanggal": tanggal,
-      "userID": userID,
+      "userId": userId,
       "status": status,
-      "documentation": documentation
-          .map((doc) => (doc as DocumentationModel).toMap())
-          .toList(),
+      "documentation": documentation.map((doc) {
+        if (doc is DocumentationModel) {
+          return doc.toMap();
+        } else {
+          // convert Documentation (entity) ke DocumentationModel
+          return DocumentationModel(
+            fotoUrl: doc.fotoUrl,
+            deskripsi: doc.deskripsi,
+            createdAt: doc.createdAt,
+          ).toMap();
+        }
+      }).toList(),
     };
   }
 
@@ -106,7 +126,7 @@ class ReportModel extends ReportEntity {
       lokasi: lokasi ?? this.lokasi,
       buktiFotoURL: buktiFotoURL ?? this.buktiFotoURL,
       tanggal: tanggal ?? this.tanggal,
-      userID: userId ?? this.userID,
+      userId: userId ?? this.userId,
       status: status ?? this.status,
       documentation: documentation ?? this.documentation,
     );
