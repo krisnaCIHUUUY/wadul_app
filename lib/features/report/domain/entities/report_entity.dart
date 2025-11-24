@@ -38,6 +38,7 @@ class ReportEntity extends Equatable {
   final DateTime tanggal;
   final String userId;
   final String status;
+  final String instansiId;
   final List<Documentation> documentation;
 
   const ReportEntity({
@@ -50,6 +51,7 @@ class ReportEntity extends Equatable {
     required this.tanggal,
     required this.userId,
     required this.status,
+    required this.instansiId,
     this.documentation = const [],
   });
 
@@ -64,6 +66,7 @@ class ReportEntity extends Equatable {
       'tanggal': FieldValue.serverTimestamp(),
       'userId': userId,
       'status': status,
+      'instansiId': instansiId,
       'documentation': documentation.map((doc) => doc.toMap()).toList(),
     };
   }
@@ -85,6 +88,7 @@ class ReportEntity extends Equatable {
       tanggal: timestamp?.toDate() ?? DateTime.now(),
       userId: map['userId'] as String,
       status: map['status'] as String,
+      instansiId: map['instansiId'] as String,
       documentation: documentationList,
     );
   }
@@ -100,6 +104,7 @@ class ReportEntity extends Equatable {
     tanggal,
     userId,
     status,
+    instansiId,
     documentation,
   ];
 }

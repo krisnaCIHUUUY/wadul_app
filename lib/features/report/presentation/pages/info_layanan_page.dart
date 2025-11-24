@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:wadul_app/core/colors/custom_colors.dart';
+import 'package:wadul_app/features/instansi/domain/entities/instansi_entity.dart';
 import 'package:wadul_app/features/report/presentation/pages/report_form_page.dart';
 
 class InfoLayananPage extends StatelessWidget {
-  const InfoLayananPage({super.key});
+  final InstansiEntity instansi;
+  const InfoLayananPage({super.key, required this.instansi});
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +48,7 @@ class InfoLayananPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Judul Layanan",
+                      instansi.nama,
                       style: TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
@@ -57,9 +59,7 @@ class InfoLayananPage extends StatelessWidget {
                     const SizedBox(height: 10),
 
                     Text(
-                      "Ini adalah deskripsi layanan yang bisa kamu isi sesuai kebutuhan. "
-                      "Gunakan untuk menjelaskan detail layanan, jam operasional, "
-                      "alamat, kontak, dan hal penting lainnya.",
+                      instansi.deskripsi,
                       style: TextStyle(fontSize: 16, fontFamily: "Poppins"),
                     ),
 
@@ -77,9 +77,9 @@ class InfoLayananPage extends StatelessWidget {
                     const SizedBox(height: 10),
 
                     Text(
-                      "• Alamat lengkap: Jl. Contoh No.123\n"
-                      "• Jam operasional: 08.00 - 16.00\n"
-                      "• Kontak: 0812-3456-7890",
+                      "• Alamat lengkap: ${instansi.alamat}\n",
+                      // "• Jam operasional: 08.00 - 16.00\n"
+                      // "• Kontak: 0812-3456-7890",
                       style: TextStyle(fontSize: 16, fontFamily: "Poppins"),
                     ),
 
@@ -91,7 +91,8 @@ class InfoLayananPage extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ReportFormPage(),
+                              builder: (context) =>
+                                  ReportFormPage(selectedInstansi: instansi),
                             ),
                           );
                         },

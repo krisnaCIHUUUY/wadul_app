@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get_it/get_it.dart';
+import 'package:wadul_app/features/instansi/data/repository/instansi_repository_impl.dart';
+import 'package:wadul_app/features/instansi/domain/repository/instansi_repository.dart';
+import 'package:wadul_app/features/instansi/presentation/cubit/instansi_cubit.dart';
 
 import 'package:wadul_app/features/report/data/datasource/report_data_source.dart';
 import 'package:wadul_app/features/report/domain/repository/report_repository.dart';
@@ -39,6 +42,10 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => GetReportById(sl()));
   // sl.registerLazySingleton(() => GetCurrentUser(sl()));
 
+  sl.registerLazySingleton<InstansiRepository>(
+    () => InstansiRepositoryImpl(firestore: sl()),
+  );
+
   // --------------------------------------------------------------------------------
   // 5. Presentation Layer (BLoC/Cubit) - Sekarang semua dependensi sudah ada
   // --------------------------------------------------------------------------------
@@ -51,4 +58,6 @@ Future<void> initDependencies() async {
       getReportById: sl(),
     ),
   );
+
+  sl.registerFactory(() => InstansiCubit(repository: sl()));
 }

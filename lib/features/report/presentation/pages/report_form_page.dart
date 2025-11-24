@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:wadul_app/core/colors/custom_colors.dart';
 import 'package:wadul_app/core/custom_textfield.dart';
+import 'package:wadul_app/features/instansi/domain/entities/instansi_entity.dart';
 import 'package:wadul_app/features/report/domain/entities/report_entity.dart';
 import 'package:wadul_app/features/report/presentation/cubit/report_cubit.dart';
 import 'package:wadul_app/features/report/presentation/cubit/report_state.dart';
@@ -17,7 +18,8 @@ final supabase = Supabase.instance.client;
 const _bucketName = "report_image";
 
 class ReportFormPage extends StatefulWidget {
-  const ReportFormPage({super.key});
+  final InstansiEntity selectedInstansi;
+  const ReportFormPage({super.key, required this.selectedInstansi});
 
   @override
   State<ReportFormPage> createState() => _ReportFormPageState();
@@ -31,6 +33,8 @@ class _ReportFormPageState extends State<ReportFormPage> {
   final lokasiController = TextEditingController();
   File? _pickedImage;
   final ImagePicker _picker = ImagePicker();
+
+  String get _instansiId => widget.selectedInstansi.id;
 
   @override
   void dispose() {
@@ -52,11 +56,7 @@ class _ReportFormPageState extends State<ReportFormPage> {
           .upload(
             fileName,
             file,
-            fileOptions: const FileOptions(
-              cacheControl: '3600',
-              upsert: false,
-              // headers: {"authorization": ''},
-            ),
+            fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
           );
 
       // Dapatkan URL publik
@@ -83,6 +83,16 @@ class _ReportFormPageState extends State<ReportFormPage> {
 
   void _submitReport(BuildContext context) async {
     if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (_instansiId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error: ID instansi tidak valid.'),
+          backgroundColor: Colors.red,
+        ),
+      );
       return;
     }
 
@@ -121,6 +131,7 @@ class _ReportFormPageState extends State<ReportFormPage> {
         tanggal: DateTime.now(),
         userId: currentUserId,
         status: 'Pending',
+        instansiId: _instansiId,
       );
 
       await context.read<ReportCubit>().createReport(newReport);

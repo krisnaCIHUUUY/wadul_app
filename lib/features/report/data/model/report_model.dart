@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:wadul_app/features/report/domain/entities/report_entity.dart'; // Import ReportEntity
 
-// Model untuk Dokumentasi (sebagai turunan dari Documentation Entity)
 class DocumentationModel extends Documentation {
   const DocumentationModel({
     required super.fotoUrl,
@@ -9,7 +8,6 @@ class DocumentationModel extends Documentation {
     required super.createdAt,
   });
 
-  // Konversi dari Map Firestore ke DocumentationModel
   factory DocumentationModel.fromMap(Map<String, dynamic> map) {
     final timestamp = map['createdAt'] as Timestamp?;
     return DocumentationModel(
@@ -18,7 +16,7 @@ class DocumentationModel extends Documentation {
       createdAt: timestamp?.toDate() ?? DateTime.now(),
     );
   }
-
+  @override
   Map<String, dynamic> toMap() {
     return {'fotoUrl': fotoUrl, 'deskripsi': deskripsi, 'createdAt': createdAt};
   }
@@ -35,6 +33,7 @@ class ReportModel extends ReportEntity {
     required super.tanggal,
     required super.userId,
     required super.status,
+    required super.instansiId,
     super.documentation,
   });
 
@@ -58,6 +57,7 @@ class ReportModel extends ReportEntity {
       tanggal: timestamp?.toDate() ?? DateTime.now(),
       userId: map["userId"] as String,
       status: map["status"] as String,
+      instansiId: map['instansiId'] as String,
       documentation: documentationList,
     );
   }
@@ -73,6 +73,7 @@ class ReportModel extends ReportEntity {
       tanggal: entity.tanggal,
       userId: entity.userId,
       status: entity.status,
+      instansiId: entity.instansiId,
       documentation: entity.documentation,
     );
   }
@@ -83,14 +84,16 @@ class ReportModel extends ReportEntity {
   @override
   Map<String, dynamic> toMap() {
     return {
-      "judul": judul,
-      "deskripsi": deskripsi,
-      "kategori": kategori,
-      "lokasi": lokasi,
-      "buktiFotoURL": buktiFotoURL,
-      "tanggal": tanggal,
-      "userId": userId,
-      "status": status,
+      // "judul": judul,
+      // "deskripsi": deskripsi,
+      // "kategori": kategori,
+      // "lokasi": lokasi,
+      // "buktiFotoURL": buktiFotoURL,
+      // "tanggal": tanggal,
+      // "userId": userId,
+      // "status": status,
+      ...super.toMap(),
+      "instansiId": instansiId,
       "documentation": documentation.map((doc) {
         if (doc is DocumentationModel) {
           return doc.toMap();
@@ -116,6 +119,7 @@ class ReportModel extends ReportEntity {
     DateTime? tanggal,
     String? userId,
     String? status,
+    String? instansiId,
     List<Documentation>? documentation,
   }) {
     return ReportModel(
@@ -128,6 +132,7 @@ class ReportModel extends ReportEntity {
       tanggal: tanggal ?? this.tanggal,
       userId: userId ?? this.userId,
       status: status ?? this.status,
+      instansiId: instansiId?? this.instansiId,
       documentation: documentation ?? this.documentation,
     );
   }
