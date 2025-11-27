@@ -143,7 +143,7 @@ class ReportDataSourceImpl implements ReportDataSource {
     try {
       final QuerySnapshot snapshot = await _firebaseFirestore
           .collection("reports")
-          .where('userID', isEqualTo: userId)
+          .where('userId', isEqualTo: userId)
           .get();
 
       final List<ReportEntity> reports = snapshot.docs

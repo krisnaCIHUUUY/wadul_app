@@ -28,7 +28,37 @@ class _ArticlePageState extends State<ArticlePage> {
     _reportCubit = sl<ReportCubit>();
 
     if (userId != null) {
-      _reportCubit.getReportsByUser(userId!);
+      _reportCubit.fetchReportsByUser(userId!);
+    } else {
+      _reportCubit.emit(
+        const ReportFailure("Anda harus login untuk melihat riwayat laporan."),
+      );
+    }
+  }
+
+  Color getStatusBackground(String status) {
+    switch (status) {
+      case "Pending":
+        return pendingBackground;
+      case "Menverifikasi":
+        return menungguBackground;
+      case "disetujui":
+        return diterimaBackground;
+      default:
+        return Colors.grey.withOpacity(0.1);
+    }
+  }
+
+  Color getStatusColor(String status) {
+    switch (status) {
+      case "Pending":
+        return pendingColor;
+      case "Menverifikasi":
+        return menungguColor;
+      case "disetujui":
+        return diterimaColor;
+      default:
+        return Colors.black38;
     }
   }
 
@@ -84,14 +114,17 @@ class _ArticlePageState extends State<ArticlePage> {
                             padding: const EdgeInsets.only(bottom: 15.0),
                             child: LaporanTile(
                               judul: report.judul,
-                              namaIntansi: report.tanggal.toString(),
+                              tanggal:
+                                  "${report.tanggal.year}/ ${report.tanggal.month}/${report.tanggal.day}",
                               status: report.status,
-                              statusBackground: report.status == "Pending"
-                                  ? pendingBackground
-                                  : diterimaBackground,
-                              statusColor: report.status == "Pending"
-                                  ? pendingColor
-                                  : diterimaColor,
+                              statusBackground: getStatusBackground(
+                                report.status,
+                              ),
+                              statusColor: getStatusColor(report.status),
+                              onTap: () {
+                                // pindah halaman
+                                // nampilin detail laporan
+                              },
                             ),
                           );
                         },

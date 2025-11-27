@@ -3,17 +3,19 @@ import 'package:wadul_app/core/colors/custom_colors.dart';
 
 class LaporanTile extends StatelessWidget {
   final String judul;
-  final String namaIntansi;
+  final String tanggal;
   final String status;
   final Color? statusBackground;
   final Color? statusColor;
+  final void Function()? onTap;
   const LaporanTile({
     super.key,
     required this.judul,
-    required this.namaIntansi,
+    required this.tanggal,
     required this.status,
+    required this.onTap,
     this.statusBackground = menungguBackground,
-    this.statusColor= menungguColor
+    this.statusColor = menungguColor,
   });
 
   @override
@@ -35,11 +37,11 @@ class LaporanTile extends StatelessWidget {
           fontSize: 15,
         ),
       ),
-      subtitle: Text(namaIntansi, style: TextStyle(fontFamily: "Poppins")),
+      subtitle: Text(tanggal, style: TextStyle(fontFamily: "Poppins")),
       tileColor: putihText,
       contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
       trailing: Container(
-        padding: EdgeInsets.symmetric(horizontal: 5, vertical: 6),
+        padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
         decoration: BoxDecoration(
           color: statusBackground,
           borderRadius: BorderRadius.circular(90),
@@ -54,6 +56,7 @@ class LaporanTile extends StatelessWidget {
           ),
         ),
       ),
+      onTap: onTap,
     );
   }
 }
