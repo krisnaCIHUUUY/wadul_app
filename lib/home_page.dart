@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wadul_app/core/colors/custom_colors.dart';
 import 'package:wadul_app/features/report/presentation/pages/add_page.dart';
-import 'package:wadul_app/core/pages/article_page.dart';
+import 'package:wadul_app/features/report/presentation/pages/article_page.dart';
 import 'package:wadul_app/core/pages/home_content.dart';
 import 'package:wadul_app/core/pages/notification_page.dart';
 import 'package:wadul_app/core/pages/profile_page.dart';

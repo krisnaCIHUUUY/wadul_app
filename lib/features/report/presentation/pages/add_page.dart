@@ -95,6 +95,7 @@ class _AddPageState extends State<AddPage> {
                         return InstansiCard(
                           nama: instansi.nama,
                           jenis: instansi.jenis,
+                          fotoUrl: instansi.fotoUrl,
                           onPressed: () {
                             Navigator.push(
                               context,

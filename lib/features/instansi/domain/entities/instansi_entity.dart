@@ -7,6 +7,7 @@ class InstansiEntity extends Equatable {
   final String deskripsi;
   final String alamat;
   final String email;
+  final String fotoUrl;
 
   const InstansiEntity({
     required this.id,
@@ -14,7 +15,8 @@ class InstansiEntity extends Equatable {
     required this.jenis,
     required this.deskripsi,
     required this.alamat,
-    required this.email
+    required this.email,
+    required this.fotoUrl,
   });
 
   factory InstansiEntity.fromFirestore(Map<String, dynamic> map, String id) {
@@ -23,11 +25,20 @@ class InstansiEntity extends Equatable {
       nama: map['nama'] ?? '',
       jenis: map['jenis'] ?? '',
       deskripsi: map['deskripsi'] ?? '',
-      alamat: map['alamat']?? '',
-      email: map['email'] ?? ''
+      alamat: map['alamat'] ?? '',
+      email: map['email'] ?? '',
+      fotoUrl: map['fotoUrl'] ?? '',
     );
   }
 
   @override
-  List<Object?> get props => [id, nama, jenis, deskripsi, alamat, email];
+  List<Object?> get props => [
+    id,
+    nama,
+    jenis,
+    deskripsi,
+    alamat,
+    email,
+    fotoUrl,
+  ];
 }

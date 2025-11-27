@@ -35,6 +35,8 @@ class _ReportFormPageState extends State<ReportFormPage> {
   final ImagePicker _picker = ImagePicker();
 
   String get _instansiId => widget.selectedInstansi.id;
+  String get _instansiFoto => widget.selectedInstansi.fotoUrl;
+  String get _instansiNama => widget.selectedInstansi.nama;
 
   @override
   void dispose() {
@@ -130,7 +132,7 @@ class _ReportFormPageState extends State<ReportFormPage> {
         buktiFotoURL: finalPhotoUrl,
         tanggal: DateTime.now(),
         userId: currentUserId,
-        status: 'Pending',
+        status: 'Menverifikasi',
         instansiId: _instansiId,
       );
 
@@ -175,7 +177,7 @@ class _ReportFormPageState extends State<ReportFormPage> {
                 left: 0,
                 right: 0,
                 height: 280,
-                child: Image.asset('assets/polres.jpg', fit: BoxFit.cover),
+                child: Image.network(_instansiFoto, fit: BoxFit.cover),
               ),
 
               Positioned(
@@ -221,6 +223,15 @@ class _ReportFormPageState extends State<ReportFormPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
 
           children: [
+            Text(
+              _instansiNama,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                fontFamily: "Poppins",
+              ),
+            ),
+
             CustomTextfield(
               controller: judulController,
               hintText: "judul",
@@ -287,8 +298,8 @@ class _ReportFormPageState extends State<ReportFormPage> {
                 ],
               ),
             ),
-            const SizedBox(height: 25),
 
+            const SizedBox(height: 10),
             BlocBuilder<ReportCubit, ReportState>(
               builder: (context, state) {
                 final bool isLoading = state is ReportLoading;

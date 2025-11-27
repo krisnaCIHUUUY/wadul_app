@@ -8,6 +8,7 @@ class InstansiModel extends InstansiEntity {
     required super.deskripsi,
     required super.alamat,
     required super.email,
+    required super.fotoUrl
   });
 
   factory InstansiModel.fromMap(Map<String, dynamic> map, String id) {
@@ -17,7 +18,8 @@ class InstansiModel extends InstansiEntity {
       jenis: map['jenis'] as String,
       deskripsi:  map['deskripsi'] as String,
       alamat:  map['alamat'] as String,
-      email: map['email'] as String
+      email: map['email'] as String,
+      fotoUrl: map['fotoUrl'] as String
     );
   }
 
@@ -28,7 +30,8 @@ class InstansiModel extends InstansiEntity {
       'jenis': jenis,
       'deskripsi': deskripsi,
       'alamat': alamat,
-      'email': email
+      'email': email,
+      'fotoUrl': fotoUrl
       // ID tidak disertakan karena ID adalah kunci dokumen
     };
   }

@@ -15,7 +15,7 @@ class InstansiRepositoryImpl implements InstansiRepository {
       final instansiList = snapshot.docs.map((doc) {
         return InstansiModel.fromMap(doc.data(), doc.id);
       }).toList();
-
+      print(instansiList);
       return instansiList;
     } on FirebaseException catch (e) {
       // Tangani error spesifik Firebase

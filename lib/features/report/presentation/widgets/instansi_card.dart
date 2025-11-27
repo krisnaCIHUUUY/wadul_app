@@ -4,6 +4,7 @@ import 'package:wadul_app/core/colors/custom_colors.dart';
 class InstansiCard extends StatelessWidget {
   final String nama;
   final String jenis;
+  final String fotoUrl;
   final void Function()? onPressed;
 
   const InstansiCard({
@@ -11,6 +12,7 @@ class InstansiCard extends StatelessWidget {
     required this.onPressed,
     required this.nama,
     required this.jenis,
+    required this.fotoUrl,
   });
 
   @override
@@ -28,7 +30,7 @@ class InstansiCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               child: AspectRatio(
                 aspectRatio: 16 / 9,
-                child: Image.asset("assets/polres.jpg", fit: BoxFit.cover),
+                child: Image.network(fotoUrl, fit: BoxFit.cover),
               ),
             ),
           ),

@@ -17,7 +17,7 @@ class InfoLayananPage extends StatelessWidget {
             left: 0,
             right: 0,
             height: 280,
-            child: Image.asset('assets/polres.jpg', fit: BoxFit.cover),
+            child: Image.network(instansi.fotoUrl, fit: BoxFit.cover),
           ),
 
           Positioned(
