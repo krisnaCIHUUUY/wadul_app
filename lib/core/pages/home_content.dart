@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wadul_app/core/colors/custom_colors.dart';
-import 'package:wadul_app/core/pages/profile_page.dart';
+import 'package:wadul_app/features/profile/presentation/pages/profile_page.dart';
 
 class HomeContent extends StatefulWidget {
   const HomeContent({super.key});

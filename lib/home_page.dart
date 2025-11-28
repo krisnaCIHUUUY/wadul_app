@@ -4,7 +4,7 @@ import 'package:wadul_app/features/report/presentation/pages/add_page.dart';
 import 'package:wadul_app/features/report/presentation/pages/article_page.dart';
 import 'package:wadul_app/core/pages/home_content.dart';
 import 'package:wadul_app/core/pages/notification_page.dart';
-import 'package:wadul_app/core/pages/profile_page.dart';
+import 'package:wadul_app/features/profile/presentation/pages/profile_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

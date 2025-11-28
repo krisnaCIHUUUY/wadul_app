@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:wadul_app/core/colors/custom_colors.dart';
-// import 'package:wadul_app/core/error/failure.dart';
 import 'package:wadul_app/features/report/domain/entities/report_entity.dart';
 import 'package:wadul_app/features/report/presentation/cubit/report_cubit.dart';
 import 'package:wadul_app/features/report/presentation/cubit/report_state.dart';
@@ -67,12 +66,12 @@ class _ArticlePageState extends State<ArticlePage> {
     return BlocProvider<ReportCubit>(
       create: (context) => _reportCubit,
       child: Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Material(
+              color: putihText,
+              child: Padding(
                 padding: const EdgeInsets.only(left: 25, top: 30, bottom: 20),
                 child: Text(
                   'Daftar Laporan',
@@ -83,28 +82,35 @@ class _ArticlePageState extends State<ArticlePage> {
                   ),
                 ),
               ),
-              Expanded(
-                child: BlocBuilder<ReportCubit, ReportState>(
-                  builder: (context, state) {
-                    if (state is ReportLoading) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+            ),
+            Expanded(
+              child: BlocBuilder<ReportCubit, ReportState>(
+                builder: (context, state) {
+                  if (state is ReportLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                    // 2. Error State
-                    if (state is ReportFailure) {
-                      return Center(
-                        child: Text(
-                          'Gagal memuat laporan: ${state.message}',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.red),
-                        ),
-                      );
-                    }
+                  // 2. Error State
+                  if (state is ReportFailure) {
+                    return Center(
+                      child: Text(
+                        'Gagal memuat laporan: ${state.message}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    );
+                  }
 
-                    if (state is ReportLoaded) {
-                      final List<ReportEntity> reportList = state.reports;
+                  if (state is ReportLoaded) {
+                    final List<ReportEntity> reportList = state.reports;
 
-                      return ListView.builder(
+                    return Padding(
+                      padding: const EdgeInsets.only(
+                        right: 15.0,
+                        left: 15,
+                        top: 15,
+                      ),
+                      child: ListView.builder(
                         itemCount: reportList.length,
                         scrollDirection: Axis.vertical,
                         itemBuilder: (context, index) {
@@ -128,14 +134,14 @@ class _ArticlePageState extends State<ArticlePage> {
                             ),
                           );
                         },
-                      );
-                    }
-                    return SizedBox();
-                  },
-                ),
+                      ),
+                    );
+                  }
+                  return SizedBox();
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
