@@ -1,6 +1,8 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:wadul_app/core/colors/custom_colors.dart';
+import 'package:wadul_app/features/admin/presentation/pages/admin_dashboard.dart';
+import 'package:wadul_app/features/admin/presentation/pages/admin_login.dart';
 import 'package:wadul_app/home_page.dart';
 import 'package:wadul_app/features/authentication/presentation/page/login_page.dart';
 import 'package:wadul_app/features/authentication/presentation/page/register_page.dart';
@@ -79,6 +81,18 @@ class OnboardingPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => HomePage()),
+                  );
+                },
+              ),
+              const SizedBox(height: 15),
+              OnboardingButton(
+                title: "admin",
+                onPressed: () {
+                  log('Masuk sebagai admin');
+                  // Arahkan ke halaman utama
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AdminDashboard()),
                   );
                 },
               ),

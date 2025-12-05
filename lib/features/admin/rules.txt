@@ -1,0 +1,75 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // helper
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // cek apakah user adalah admin (field isAdmin di collection users)
+    // IMPORTANT: hanya set isAdmin dari server-side / Console / Admin SDK
+    function isAdmin() {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+
+    // -----------------------
+    // RULES USERS
+    // -----------------------
+    match /users/{userId} {
+      // semua user yang login boleh membaca daftar user (atau sesuaikan jika mau pembatasan)
+      allow read: if isSignedIn();
+
+      // create: hanya user itu sendiri boleh membuat dokumen profilnya,
+      // dan client TIDAK boleh menyertakan field 'isAdmin' saat membuat
+      allow create: if isSignedIn()
+                    && request.auth.uid == userId
+                    && !(request.resource.data.keys().hasAny(['isAdmin']));
+
+      // update: hanya pemilik dokumen boleh update, dan tidak boleh mengubah 'isAdmin'
+      allow update: if isSignedIn()
+                    && request.auth.uid == userId
+                    && !(request.resource.data.keys().hasAny(['isAdmin']));
+
+      // delete: hanya admin yang boleh hapus user
+      allow delete: if isAdmin();
+    }
+
+    // -----------------------
+    // RULES INSTANSI
+    // -----------------------
+    match /instansi/{instansiId} {
+      // publik baca
+      allow read: if true;
+
+      // create/update/delete: hanya admin
+      // (kalau kamu mau biarkan user terautentikasi menambah, ubah isAdmin() -> isSignedIn())
+      allow create, update, delete: if isAdmin();
+    }
+
+    // -----------------------
+    // RULES REPORTS
+    // -----------------------
+    match /reports/{reportId} {
+      // siapa saja yang login boleh membuat laporan
+      allow create: if isSignedIn();
+
+      // get (baca satu dokumen): pemilik laporan atau admin
+      allow get: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+
+      // list: izinkan jika admin (boleh lihat semua), atau jika query yang dijalankan
+      // memfilter berdasarkan userId == request.auth.uid (agar user hanya bisa list laporan miliknya)
+      // NOTE: klien harus memasukkan `.where('userId', '==', uid)` pada query untuk bisa list.
+      allow list: if isSignedIn() && (
+                    isAdmin()
+                    || (request.query != null && request.query.where('userId', '==', request.auth.uid))
+                  );
+
+      // update/delete: hanya admin boleh ubah/hapus laporan
+      allow update, delete: if isAdmin();
+    }
+
+    // default: deny untuk koleksi lain (tidak didefinisikan)
+  }
+}
