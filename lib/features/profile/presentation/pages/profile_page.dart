@@ -22,7 +22,6 @@ class _ProfilePageState extends State<ProfilePage> {
       backgroundColor: putihBackground,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        // mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Stack(
             clipBehavior: Clip.none,
@@ -45,6 +44,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: IconButton(
                     onPressed: () {
                       context.read<AuthCubit>().logout();
+                      Navigator.pushReplacementNamed(context, "/onboarding");
                     },
                     icon: Icon(Icons.logout, color: putihText, size: 30),
                   ),
@@ -84,7 +84,9 @@ class _ProfilePageState extends State<ProfilePage> {
           Padding(
             padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
             child: ListTile(
-              onTap: () {},
+              onTap: () {
+                // NAMPILKE HALAMAN DETAIL PROFILE
+              },
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadiusGeometry.circular(10),
               ),
@@ -104,7 +106,9 @@ class _ProfilePageState extends State<ProfilePage> {
           Padding(
             padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
             child: ListTile(
-              onTap: () {},
+              onTap: () {
+                // NAMPILKE BANTUAN DAN LAYANAN
+              },
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadiusGeometry.circular(10),
               ),
@@ -124,7 +128,9 @@ class _ProfilePageState extends State<ProfilePage> {
           Padding(
             padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
             child: ListTile(
-              onTap: () {},
+              onTap: () {
+                // NAMPILKE TENTANG APLIKASI
+              },
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadiusGeometry.circular(10),
               ),
@@ -140,11 +146,13 @@ class _ProfilePageState extends State<ProfilePage> {
               subtitle: Text("Informasi Aplikasi"),
             ),
           ),
-          
+
           Padding(
             padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
             child: ListTile(
-              onTap: () {},
+              onTap: () {
+                // ULASAN RENG PLAYSTORE
+              },
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadiusGeometry.circular(10),
               ),

@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 import 'package:wadul_app/core/injection_container.dart' as di;
+import 'package:wadul_app/features/admin/presentation/admin_dashboard.dart';
+import 'package:wadul_app/features/admin/presentation/admin_page.dart';
 import 'package:wadul_app/features/authentication/data/datasource/auth_firebase_data_source.dart';
 import 'package:wadul_app/features/authentication/data/repository/auth_repository_impl.dart';
 import 'package:wadul_app/features/authentication/domain/usecases/get_current_user.dart';
@@ -13,6 +15,8 @@ import 'package:wadul_app/features/authentication/domain/usecases/user_logout.da
 import 'package:wadul_app/features/authentication/domain/usecases/user_lupa_sandi.dart';
 import 'package:wadul_app/features/authentication/domain/usecases/user_masuk.dart';
 import 'package:wadul_app/features/authentication/presentation/cubit/auth_cubit.dart';
+import 'package:wadul_app/features/authentication/presentation/page/login_page.dart';
+import 'package:wadul_app/features/authentication/presentation/page/register_page.dart';
 import 'package:wadul_app/home_page.dart';
 import 'package:wadul_app/features/authentication/presentation/page/onboarding_page.dart';
 import 'package:wadul_app/firebase_options.dart';
@@ -86,6 +90,15 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'WADUL',
+        initialRoute: '/',
+        routes: {
+          "/onboarding": (context) => OnboardingPage(),
+          "/admin-dashboard": (context) => AdminDashboardPage(),
+          "/admin-login": (context) => AdminPage(),
+          "/register-page": (context) => RegisterPage(),
+          "/login-page": (context) => LoginPage(),
+          "/home-page": (context) => HomePage()
+        },
         theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
         home: StreamBuilder<User?>(
           stream: FirebaseAuth.instance.authStateChanges(),

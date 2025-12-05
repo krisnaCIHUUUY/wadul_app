@@ -61,6 +61,7 @@ class _ArticlePageState extends State<ArticlePage> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider<ReportCubit>(
@@ -90,7 +91,6 @@ class _ArticlePageState extends State<ArticlePage> {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  // 2. Error State
                   if (state is ReportFailure) {
                     return Center(
                       child: Text(

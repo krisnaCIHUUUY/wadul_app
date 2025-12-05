@@ -51,9 +51,9 @@ class _RegisterPageState extends State<RegisterPage> {
               backgroundColor: Colors.green,
             ),
           );
-          Navigator.pushAndRemoveUntil(
+          Navigator.pushNamedAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => const LoginPage()),
+            "login-page",
             (route) => false,
           );
         } else if (state is AuthFailure) {
@@ -247,13 +247,9 @@ class _RegisterPageState extends State<RegisterPage> {
                                   ),
                                   GestureDetector(
                                     onTap: () {
-                                      Navigator.push(
+                                      Navigator.pushNamed(
                                         context,
-                                        MaterialPageRoute(
-                                          builder: (context) {
-                                            return LoginPage();
-                                          },
-                                        ),
+                                        "/login-page"
                                       );
                                     },
                                     child: Text(

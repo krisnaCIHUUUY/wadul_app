@@ -59,7 +59,7 @@ class ReportDataSourceImpl implements ReportDataSource {
     try {
       final reportModel = ReportModel.fromEntity(report);
       Map<String, dynamic> dataToSave = reportModel.toMap();
-      await _firebaseFirestore.collection("reports").add(dataToSave);
+      await _firebaseFirestore.collection("reports").doc().set(dataToSave);
       log("data behasil di upload");
     } on FirebaseException catch (e) {
       log("error takterduga:  ${e.message}");

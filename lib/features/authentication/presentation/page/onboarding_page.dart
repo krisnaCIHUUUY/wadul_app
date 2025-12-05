@@ -1,9 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:wadul_app/core/colors/custom_colors.dart';
-import 'package:wadul_app/home_page.dart';
-import 'package:wadul_app/features/authentication/presentation/page/login_page.dart';
-import 'package:wadul_app/features/authentication/presentation/page/register_page.dart';
 import 'package:wadul_app/features/authentication/presentation/utils/onboarding_button.dart';
 
 class OnboardingPage extends StatelessWidget {
@@ -53,10 +50,7 @@ class OnboardingPage extends StatelessWidget {
                 title: 'Daftar Akun',
                 onPressed: () {
                   log('Navigasi ke halaman pendaftaran');
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RegisterPage()),
-                  );
+                  Navigator.pushNamed(context, "/register-page");
                 },
               ),
               const SizedBox(height: 15),
@@ -64,10 +58,7 @@ class OnboardingPage extends StatelessWidget {
                 title: 'Masuk',
                 onPressed: () {
                   log('Navigasi ke halaman login');
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginPage()),
-                  );
+                  Navigator.pushNamed(context, "/login-page");
                 },
               ),
               const SizedBox(height: 15),
@@ -76,10 +67,15 @@ class OnboardingPage extends StatelessWidget {
                 onPressed: () {
                   log('Masuk sebagai guest');
                   // Arahkan ke halaman utama
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomePage()),
-                  );
+                  // Navigator.pushNamed(context, "/home-page");
+                },
+              ),
+              const SizedBox(height: 15),
+              // tombol
+              OnboardingButton(
+                title: "admin",
+                onPressed: () {
+                  Navigator.pushNamed(context, "/admin-login");
                 },
               ),
               const Spacer(),
