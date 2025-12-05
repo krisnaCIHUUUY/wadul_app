@@ -25,7 +25,7 @@ class _HomeContentState extends State<HomeContent> {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Container(
+          child: SizedBox(
             height: 110,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
