@@ -1,3 +1,4 @@
+// lib/pages/admin_dashboard.dart
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -11,13 +12,16 @@ class AdminDashboardPage extends StatefulWidget {
   State<AdminDashboardPage> createState() => _AdminDashboardPageState();
 }
 
-class _AdminDashboardPageState extends State<AdminDashboardPage> {
+class _AdminDashboardPageState extends State<AdminDashboardPage>
+    with SingleTickerProviderStateMixin {
   final List<String> _statuses = [
-    'pending',
+    'Menverifikasi',
     'in_progress',
     'disetujui',
-    'rejected',
+    'ditolak',
   ];
+
+  late final TabController _tabController;
 
   bool _loadingRole = true;
   bool _isAdmin = false;
@@ -26,7 +30,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: _statuses.length, vsync: this);
     _checkRole();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   Future<void> _checkRole() async {
@@ -100,15 +111,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           safeNote['at'] = Timestamp.fromDate(DateTime.now());
         }
 
-        // final user = FirebaseAuth.instance.currentUser;
-        // log('current UID: ${user?.uid}');
-
-        // final doc = await FirebaseFirestore.instance
-        //     .collection('users')
-        //     .doc(user!.uid)
-        //     .get();
-        // log('users doc exists: ${doc.exists}, data: ${doc.data()}');
-
         await ref.update({
           ...topLevel,
           'adminNotes': FieldValue.arrayUnion([safeNote]),
@@ -160,16 +162,76 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     }
   }
 
+  Widget _buildReportCard(String docId, Map<String, dynamic> data) {
+    final status = (data['status'] as String?) ?? 'pending';
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+      child: ListTile(
+        title: Text(data['judul'] ?? 'Tanpa judul'),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(data['deskripsi'] ?? ''),
+            SizedBox(height: 6),
+            Text('Status: $status'),
+            if (data['instansiId'] != null)
+              Text('Instansi: ${data['instansiId']}'),
+            if (data['kategori'] != null) Text('Kategori: ${data['kategori']}'),
+          ],
+        ),
+        isThreeLine: true,
+        trailing: PopupMenuButton<String>(
+          onSelected: (value) async {
+            if (value == 'delete') {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (_) => AlertDialog(
+                  title: Text('Konfirmasi'),
+                  content: Text(
+                    'Hapus laporan ini? Tindakan tidak bisa dibatalkan.',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: Text('Batal'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child: Text('Hapus'),
+                    ),
+                  ],
+                ),
+              );
+              if (confirm == true) await _deleteReport(docId);
+            } else if (value == 'open') {
+              _openDetail(context, docId, data);
+            }
+          },
+          itemBuilder: (_) => [
+            PopupMenuItem(value: 'open', child: Text('Buka')),
+            PopupMenuItem(
+              value: 'delete',
+              child: Text('Hapus', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        ),
+        onTap: () => _showQuickEditor(context, docId, data),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final reportsRef = FirebaseFirestore.instance
-        .collection('reports')
-        .orderBy('tanggal', descending: true);
-
+    // no single reportsRef now; we use per-status query inside TabBarView
     return Scaffold(
       appBar: AppBar(
         leading: SizedBox(),
         title: Text('Admin Dashboard'),
+        bottom: TabBar(
+          controller: _tabController,
+          isScrollable: true,
+          tabs: _statuses.map((s) => Tab(text: s.toUpperCase())).toList(),
+        ),
         actions: [
           IconButton(
             tooltip: 'Refresh role',
@@ -190,91 +252,80 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       ),
       body: _loadingRole
           ? Center(child: CircularProgressIndicator())
-          : StreamBuilder<QuerySnapshot>(
-              stream: reportsRef.snapshots(),
-              builder: (context, snap) {
-                if (snap.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
-                if (!snap.hasData || snap.data!.docs.isEmpty) {
-                  return Center(child: Text('Belum ada laporan.'));
-                }
-                final docs = snap.data!.docs;
-                return ListView.builder(
-                  itemCount: docs.length,
-                  itemBuilder: (ctx, i) {
-                    final doc = docs[i];
-                    final data = doc.data() as Map<String, dynamic>;
-                    final status = (data['status'] as String?) ?? 'pending';
-                    return Card(
-                      margin: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                      child: ListTile(
-                        title: Text(data['judul'] ?? 'Tanpa judul'),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(data['deskripsi'] ?? ''),
-                            SizedBox(height: 6),
-                            Text('Status: $status'),
-                            if (data['instansiId'] != null)
-                              Text('Instansi: ${data['instansiId']}'),
-                            if (data['kategori'] != null)
-                              Text('Kategori: ${data['kategori']}'),
-                          ],
-                        ),
-                        isThreeLine: true,
-                        trailing: PopupMenuButton<String>(
-                          onSelected: (value) async {
-                            if (value == 'delete') {
-                              final confirm = await showDialog<bool>(
-                                context: context,
-                                builder: (_) => AlertDialog(
-                                  title: Text('Konfirmasi'),
-                                  content: Text(
-                                    'Hapus laporan ini? Tindakan tidak bisa dibatalkan.',
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(context, false),
-                                      child: Text('Batal'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(context, true),
-                                      child: Text('Hapus'),
-                                    ),
-                                  ],
-                                ),
-                              );
-                              if (confirm == true) await _deleteReport(doc.id);
-                            } else if (value == 'open') {
-                              _openDetail(context, doc.id, data);
-                            }
-                          },
-                          itemBuilder: (_) => [
-                            PopupMenuItem(value: 'open', child: Text('Buka')),
-                            PopupMenuItem(
-                              value: 'delete',
-                              child: Text(
-                                'Hapus',
-                                style: TextStyle(color: Colors.red),
-                              ),
-                            ),
-                          ],
-                        ),
-                        onTap: () => _showQuickEditor(context, doc.id, data),
-                      ),
+          : TabBarView(
+              controller: _tabController,
+              children: _statuses.map((status) {
+                final query = FirebaseFirestore.instance
+                    .collection('reports')
+                    .where('status', isEqualTo: status)
+                    .orderBy('tanggal', descending: true);
+
+                return StreamBuilder<QuerySnapshot>(
+                  stream: query.snapshots(),
+                  builder: (context, snap) {
+                    if (snap.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (!snap.hasData || snap.data!.docs.isEmpty) {
+                      return Center(child: Text('Tidak ada laporan $status.'));
+                    }
+                    final docs = snap.data!.docs;
+                    return ListView.builder(
+                      itemCount: docs.length,
+                      itemBuilder: (ctx, i) {
+                        final doc = docs[i];
+                        final data = doc.data() as Map<String, dynamic>;
+                        return _buildReportCard(doc.id, data);
+                      },
                     );
                   },
                 );
-              },
+              }).toList(),
             ),
     );
   }
 
   void _openDetail(BuildContext context, String id, Map<String, dynamic> data) {
-    final adminNotes = (data['adminNotes'] as List?) ?? [];
+    // helper: konversi apapun -> List<String>
+    List<String> _toStringList(dynamic raw) {
+      if (raw == null) return [];
+      if (raw is List) {
+        return raw
+            .map((e) => e?.toString() ?? '')
+            .where((s) => s.isNotEmpty)
+            .toList();
+      }
+      if (raw is String && raw.isNotEmpty) return [raw];
+      return [];
+    }
+
+    // helper: konversi adminNotes ke List<Map<String,dynamic>>
+    List<Map<String, dynamic>> _toAdminNotes(dynamic raw) {
+      final List<Map<String, dynamic>> out = [];
+      if (raw == null) return out;
+      if (raw is List) {
+        for (var item in raw) {
+          if (item is Map) {
+            // safe copy
+            final map = Map<String, dynamic>.from(item);
+            out.add(map);
+          } else if (item is String && item.isNotEmpty) {
+            out.add({'text': item, 'by': null, 'at': null});
+          } else {
+            // ignore other types
+          }
+        }
+        return out;
+      }
+      if (raw is String && raw.isNotEmpty) {
+        out.add({'text': raw, 'by': null, 'at': null});
+      }
+      return out;
+    }
+
+    final adminNotes = _toAdminNotes(data['adminNotes']);
+    final buktiList = _toStringList(data['buktiFotoURL']); // safe list
+
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -283,11 +334,20 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if ((data['buktiFotoURL'] as List?)?.isNotEmpty == true) ...[
+              if (buktiList.isNotEmpty) ...[
                 Text('Bukti Foto:'),
                 SizedBox(height: 8),
-                for (var img in (data['buktiFotoURL'] as List))
-                  Image.network(img, height: 120),
+                for (var img in buktiList)
+                  // jika url mungkin kosong/string invalid, tangani dengan try/catch sederhana
+                  Builder(
+                    builder: (ctx) {
+                      try {
+                        return Image.network(img, height: 120);
+                      } catch (_) {
+                        return SizedBox.shrink();
+                      }
+                    },
+                  ),
                 SizedBox(height: 8),
               ],
               Text(data['deskripsi'] ?? ''),
@@ -305,7 +365,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(note['text'] ?? ''),
+                      Text(note['text']?.toString() ?? ''),
                       SizedBox(height: 4),
                       Text(
                         'Oleh: ${note['by'] ?? '-'} · ${_formatTimestamp(note['at'])}',
@@ -401,7 +461,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                           TextField(
                             controller: assignController,
                             decoration: InputDecoration(
-                              labelText: 'Assign ke (instansiId atau uid)',
+                              labelText: 'Assign ke (instansiId)',
                             ),
                           ),
                           TextField(
@@ -447,7 +507,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
                                 final updates = {
                                   'status': currentStatus,
-                                  'assignedTo': assignController.text.trim(),
+                                  'instansiId': assignController.text.trim(),
                                   'updatedAt': FieldValue.serverTimestamp(),
                                   'updatedBy': _currentUid,
                                 };
@@ -457,7 +517,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                                   adminNote = {
                                     'text': noteController.text.trim(),
                                     'by': _currentUid,
-                                    'at': FieldValue.serverTimestamp(),
+                                    'at': Timestamp.fromDate(
+                                      DateTime.now(),
+                                    ), // safe client ts for note
                                   };
                                 }
 
@@ -466,7 +528,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                                   updates,
                                   adminNote: adminNote,
                                 );
-                                if (mounted) Navigator.pop(context);
+                                if (mounted) Navigator.pop(ctx);
                               },
                         child: Text('Simpan'),
                       ),

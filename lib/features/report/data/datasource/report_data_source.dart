@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:wadul_app/features/report/data/model/report_model.dart';
 import 'package:wadul_app/features/report/domain/entities/report_entity.dart';
 
@@ -139,11 +140,36 @@ class ReportDataSourceImpl implements ReportDataSource {
   }
 
   @override
-  Future<List<ReportEntity>> getReportByUser(String userId) async {
+  Future<List<ReportEntity>> getReportByUser(String userIdFromCaller) async {
     try {
+      // 1. cek auth
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        throw Exception('User belum terautentikasi');
+      }
+      final authUid = currentUser.uid;
+
+      // 2. periksa apakah pemanggil admin (rules juga memeriksa ini server-side)
+      final userDoc = await _firebaseFirestore
+          .collection('users')
+          .doc(authUid)
+          .get();
+      final role = userDoc.data()?['role'] as String?;
+      final bool isAdmin = role == 'admin';
+
+      // 3. tentukan uid yang akan dipakai di query:
+      //    - jika admin, gunakan userIdFromCaller (boleh memanggil laporan siapa saja)
+      //    - jika bukan admin, paksa pakai authUid (agar cocok dengan rules)
+      final String queryUid = isAdmin ? userIdFromCaller : authUid;
+
+      // Debug helpful logs
+      log('Auth UID: $authUid, role: $role, queryUid: $queryUid');
+
+      // 4. jalankan query yang aman
       final QuerySnapshot snapshot = await _firebaseFirestore
           .collection("reports")
-          .where('userId', isEqualTo: userId)
+          .where('userId', isEqualTo: queryUid)
+          .orderBy('tanggal', descending: true) // opsional, tapi konsisten
           .get();
 
       final List<ReportEntity> reports = snapshot.docs
@@ -154,7 +180,7 @@ class ReportDataSourceImpl implements ReportDataSource {
           .toList();
 
       log(
-        'Berhasil mengambil ${reports.length} laporan untuk User ID: $userId.',
+        'Berhasil mengambil ${reports.length} laporan untuk User ID: $queryUid.',
       );
       return reports;
     } on FirebaseException catch (e) {
@@ -167,6 +193,7 @@ class ReportDataSourceImpl implements ReportDataSource {
       );
     }
   }
+
 
   @override
   Future<void> updateReportStatus({

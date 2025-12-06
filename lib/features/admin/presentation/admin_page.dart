@@ -54,6 +54,7 @@ class _AdminPageState extends State<AdminPage> {
         // bukan admin -> logout & kabur
         await FirebaseAuth.instance.signOut();
         _showError('Akses ditolak. Akun ini bukan admin.');
+        // log(userCredential.toString());
         return;
       }
 
@@ -161,16 +162,7 @@ class _AdminPageState extends State<AdminPage> {
                         ),
                 ),
               ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () {
-                  // kalau perlu: redirect ke fungsi lupa password
-                },
-                child: Text(
-                  'Lupa password?',
-                  style: TextStyle(color: hitamtext),
-                ),
-              ),
+              // const SizedBox(height: 12),
             ],
           ),
         ),

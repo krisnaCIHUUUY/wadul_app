@@ -19,7 +19,8 @@ class ArticlePage extends StatefulWidget {
 
 class _ArticlePageState extends State<ArticlePage> {
   late final ReportCubit _reportCubit;
-  final String? userId = FirebaseAuth.instance.currentUser?.uid;
+  final String? userId = FirebaseAuth.instance.currentUser!.uid;
+
 
   @override
   void initState() {
@@ -60,7 +61,6 @@ class _ArticlePageState extends State<ArticlePage> {
         return Colors.black38;
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
