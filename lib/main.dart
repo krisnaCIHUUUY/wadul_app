@@ -17,6 +17,7 @@ import 'package:wadul_app/features/authentication/domain/usecases/user_masuk.dar
 import 'package:wadul_app/features/authentication/presentation/cubit/auth_cubit.dart';
 import 'package:wadul_app/features/authentication/presentation/page/login_page.dart';
 import 'package:wadul_app/features/authentication/presentation/page/register_page.dart';
+import 'package:wadul_app/features/super_admin/presentation/pages/super_admin_page.dart';
 import 'package:wadul_app/home_page.dart';
 import 'package:wadul_app/features/authentication/presentation/page/onboarding_page.dart';
 import 'package:wadul_app/firebase_options.dart';
@@ -60,7 +61,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   final UserDaftar userDaftar;
   final UserMasuk userMasuk;
-  final UserLogout userLogout;
+  final UserLogout userLogout; 
   final UserLupaSandi userLupaSandi;
   final GetCurrentUser currentUser;
 
@@ -97,7 +98,8 @@ class MyApp extends StatelessWidget {
           "/admin-login": (context) => AdminPage(),
           "/register-page": (context) => RegisterPage(),
           "/login-page": (context) => LoginPage(),
-          "/home-page": (context) => HomePage()
+          "/home-page": (context) => HomePage(),
+          "/super-admin-page": (context) => SuperAdminPage(),
         },
         theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
         home: StreamBuilder<User?>(
@@ -109,6 +111,9 @@ class MyApp extends StatelessWidget {
               );
             }
             if (snapshot.hasData) {
+              if (snapshot.data!.email == "superadmin123@gmail.com") {
+                return SuperAdminPage();
+              }
               return HomePage();
             } else {
               return OnboardingPage();

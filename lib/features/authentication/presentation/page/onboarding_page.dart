@@ -1,10 +1,56 @@
 import 'dart:developer';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:wadul_app/core/colors/custom_colors.dart';
 import 'package:wadul_app/features/authentication/presentation/utils/onboarding_button.dart';
 
 class OnboardingPage extends StatelessWidget {
   const OnboardingPage({super.key});
+
+  final String superAdminEmail = 'superadmin123@gmail.com';
+  final String superAdminPassword = 'superadmin123';
+
+  Future<void> _handleSuperAdminLogin(BuildContext context) async {
+    // Tampilkan indikator loading (opsional tapi disarankan)
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+            email: superAdminEmail,
+            password: superAdminPassword,
+          );
+
+          
+      log('Super Admin login berhasil: ${userCredential.user!.uid}');
+
+      Navigator.of(context).pop();
+      Navigator.pushReplacementNamed(context, "/super-admin-page");
+    } on FirebaseAuthException catch (e) {
+      // Tutup indikator loading
+      Navigator.of(context).pop();
+
+      log('Login Super Admin Gagal: ${e.code}');
+      String errorMessage =
+          'Login gagal. Email/password salah atau akun tidak ditemukan.';
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(errorMessage)));
+    } catch (e) {
+      // Tutup indikator loading
+      Navigator.of(context).pop();
+
+      log('Error tidak terduga: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Terjadi kesalahan saat masuk.')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,15 +113,22 @@ class OnboardingPage extends StatelessWidget {
                 onPressed: () {
                   log('Masuk sebagai guest');
                   // Arahkan ke halaman utama
-                  // Navigator.pushNamed(context, "/home-page");
+                  Navigator.pushNamed(context, "/home-page");
                 },
               ),
               const SizedBox(height: 15),
-              // tombol
               OnboardingButton(
                 title: "admin",
                 onPressed: () {
                   Navigator.pushNamed(context, "/admin-login");
+                },
+              ),
+              const SizedBox(height: 15),
+              OnboardingButton(
+                title: "Super Admin",
+                onPressed: () async {
+                  await _handleSuperAdminLogin(context);
+                  
                 },
               ),
               const Spacer(),

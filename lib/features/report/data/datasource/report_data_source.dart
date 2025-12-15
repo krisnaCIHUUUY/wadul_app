@@ -169,7 +169,6 @@ class ReportDataSourceImpl implements ReportDataSource {
       final QuerySnapshot snapshot = await _firebaseFirestore
           .collection("reports")
           .where('userId', isEqualTo: queryUid)
-          .orderBy('tanggal', descending: true) // opsional, tapi konsisten
           .get();
 
       final List<ReportEntity> reports = snapshot.docs
@@ -193,7 +192,6 @@ class ReportDataSourceImpl implements ReportDataSource {
       );
     }
   }
-
 
   @override
   Future<void> updateReportStatus({

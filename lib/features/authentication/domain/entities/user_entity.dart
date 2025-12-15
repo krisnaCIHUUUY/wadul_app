@@ -8,4 +8,6 @@ class UserEntity extends Equatable {
 
   @override
   List<Object?> get props => [id, email, displayName];
+
+  static fromJson(Map<String, dynamic> data, String id) {}
 }
